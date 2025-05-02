@@ -1,0 +1,20 @@
+Regulador 6.5-36Vin 5Vout 2A Traco Power TSR 2-2450:
+https://jlcpcb.com/partdetail/TracoPower-TSR_22450/C5198099
+https://es.rs-online.com/web/p/reguladores-de-conmutacion/9068487
+
+Molex Mini-Fit Jr. de 3 vías:
+https://jlcpcb.com/partdetail/Molex-39301039/C505007
+https://es.rs-online.com/web/p/conectores-macho-para-pcb/6705751P?gb=s
+https://es.rs-online.com/web/p/carcasas-de-cables-y-conectores-macho/5109685
+
+Led SMD verde: https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0805G/C2297
+Diodo protección 5V: https://jlcpcb.com/partdetail/mdd_microdiode_semiconductor-SS34/C8678
+PinSocket 22P: 
+Conector JST-XH: https://jlcpcb.com/partdetail/Jst-B2B_XH_A_LF_SN/C158012
+Pin header 2P: https://jlcpcb.com/partdetail/Xfcn-PZ254V_1102P/C492401
+Resistencia 4.7k: https://jlcpcb.com/partdetail/23889-0603WAF4701T5E/C23162
+Resistencia 120R: https://jlcpcb.com/partdetail/23514-0603WAF1200T5E/C22787
+Resistencia 1k: https://jlcpcb.com/partdetail/21904-0603WAF1001T5E/C21190
+Resistencia 10k: https://jlcpcb.com/partdetail/26547-0603WAF1002T5E/C25804
+SN65HVD230DR: https://jlcpcb.com/partdetail/TexasInstruments-SN65HVD230DR/C12084
+
