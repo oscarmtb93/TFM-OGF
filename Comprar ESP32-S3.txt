@@ -1,4 +1,5 @@
 (Color: N16R8): https://es.aliexpress.com/item/1005007319706057.html
 (Color: 3PCS): https://www.amazon.es/Diymore-DevKitC-WROOM1-Desarrollo-Bluetooth/dp/B0DHJRNR4B?th=1
 
-Mouser N8R2: https://www.mouser.es/ProductDetail/Espressif-Systems/ESP32-S3-DevKitC-1U-N8R8?qs=sGAEpiMZZMuqBwn8WqcFUipNgoezRlc4njrhy2WcihfAFlCVG3HM4A%3D%3D
+Mouser U-N8R8: https://www.mouser.es/ProductDetail/Espressif-Systems/ESP32-S3-DevKitC-1U-N8R8?qs=sGAEpiMZZMuqBwn8WqcFUipNgoezRlc4njrhy2WcihfAFlCVG3HM4A%3D%3D
+Mouser U-N8R2: https://www.mouser.es/ProductDetail/Espressif-Systems/ESP32-S3-DevKitC-1U-N8R2?qs=sGAEpiMZZMuqBwn8WqcFUipNgoezRlc44YXDNjqTd3Ay%2FzFxFONDrA%3D%3D
