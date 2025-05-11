@@ -2362,6 +2362,12 @@
 		(uuid "4dd598c7-42f5-4988-bd26-1c8e26a8d429")
 	)
 	(junction
+		(at 103.886 25.4)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "53238300-e1f3-4192-b416-cc7ad1e3594f")
+	)
+	(junction
 		(at 66.548 30.48)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2378,12 +2384,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "78cf93ea-535b-44ec-a86f-7c6175565f65")
-	)
-	(junction
-		(at 103.886 25.4)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "957644d7-7eee-4b57-a2e1-bd8859c04f3c")
 	)
 	(junction
 		(at 49.276 85.598)
@@ -7260,7 +7260,7 @@
 		(dnp no)
 		(uuid "52d799e4-4ad0-4438-8a08-20aad86a064b")
 		(property "Reference" "R5"
-			(at 36.83 133.096 90)
+			(at 36.83 124.46 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7268,7 +7268,7 @@
 			)
 		)
 		(property "Value" "10K"
-			(at 36.83 130.556 90)
+			(at 36.83 129.032 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7573,7 +7573,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 107.696 25.4 270)
+		(at 107.696 25.4 90)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -7582,7 +7582,7 @@
 		(dnp no)
 		(uuid "5ae44b5f-9ad9-4065-a175-5460bc95b937")
 		(property "Reference" "R2"
-			(at 107.696 23.368 90)
+			(at 107.696 23.114 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7590,7 +7590,7 @@
 			)
 		)
 		(property "Value" "1K"
-			(at 107.696 27.432 90)
+			(at 107.696 27.686 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7598,7 +7598,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 107.696 27.178 90)
+			(at 107.696 23.622 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7650,7 +7650,7 @@
 		(dnp no)
 		(uuid "5dbd0b40-2272-4b61-a96e-95bf8260f239")
 		(property "Reference" "R6"
-			(at 70.612 120.904 90)
+			(at 70.612 112.522 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7658,7 +7658,7 @@
 			)
 		)
 		(property "Value" "120R"
-			(at 70.612 118.364 90)
+			(at 70.612 117.094 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7718,7 +7718,7 @@
 		(dnp no)
 		(uuid "664f0262-b871-417e-bb6c-e2e29aba691c")
 		(property "Reference" "R1"
-			(at 68.58 38.354 90)
+			(at 64.008 38.354 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7726,7 +7726,7 @@
 			)
 		)
 		(property "Value" "4.7K"
-			(at 64.516 38.354 90)
+			(at 68.834 38.608 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7934,7 +7934,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 70.612 73.406 90)
+		(at 70.612 73.406 270)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -7943,7 +7943,7 @@
 		(dnp no)
 		(uuid "8fe83bf9-e046-4650-a195-5a1cff48b568")
 		(property "Reference" "R4"
-			(at 70.612 79.756 90)
+			(at 70.612 71.12 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7951,7 +7951,7 @@
 			)
 		)
 		(property "Value" "120R"
-			(at 70.612 77.216 90)
+			(at 70.612 75.946 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7959,7 +7959,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 70.612 71.628 90)
+			(at 70.612 75.184 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8069,7 +8069,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 36.83 85.598 90)
+		(at 36.83 85.598 270)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -8078,7 +8078,7 @@
 		(dnp no)
 		(uuid "a10f2269-8856-42fa-8934-48175be6b319")
 		(property "Reference" "R3"
-			(at 36.83 91.948 90)
+			(at 36.83 83.312 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8086,7 +8086,7 @@
 			)
 		)
 		(property "Value" "10K"
-			(at 36.83 89.408 90)
+			(at 36.83 87.884 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8094,7 +8094,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 36.83 83.82 90)
+			(at 36.83 87.376 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8279,8 +8279,8 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b594ea2e-f026-48d6-bfa9-f94f7808e889")
-		(property "Reference" "R11"
-			(at 34.29 154.94 90)
+		(property "Reference" "R7"
+			(at 29.972 155.194 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8288,7 +8288,7 @@
 			)
 		)
 		(property "Value" "200R"
-			(at 29.21 155.194 90)
+			(at 29.972 160.02 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8331,7 +8331,7 @@
 		(instances
 			(project "TFM-OGF"
 				(path "/41b37644-2050-448d-bbd4-fcd0da7fc3d1"
-					(reference "R11")
+					(reference "R7")
 					(unit 1)
 				)
 			)
