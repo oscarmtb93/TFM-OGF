@@ -2210,7 +2210,7 @@
 	)
 	(rectangle
 		(start 16.256 138.43)
-		(end 82.804 162.56)
+		(end 82.804 164.592)
 		(stroke
 			(width 0)
 			(type solid)
@@ -6131,7 +6131,7 @@
 			)
 		)
 	)
-	(global_label "3.3V"
+	(global_label "3.3V_1"
 		(shape input)
 		(at 68.072 154.94 270)
 		(fields_autoplaced yes)
@@ -6143,7 +6143,7 @@
 		)
 		(uuid "cf58b4b7-01d7-4c85-ab15-62391d0270e7")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 68.072 161.4328 90)
+			(at 68.072 164.2147 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7881,7 +7881,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "Led_Power_Externo"
+		(property "Value" "Led_Pow_Ext"
 			(at 24.384 149.86 90)
 			(effects
 				(font

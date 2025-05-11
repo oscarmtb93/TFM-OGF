@@ -12,12 +12,14 @@ https://es.rs-online.com/web/p/conectores-d-sub/6156171
 
 Led SMD verde: https://jlcpcb.com/partdetail/Hubei_KentoElec-KT0805G/C2297
 Diodo protección 5V: https://jlcpcb.com/partdetail/mdd_microdiode_semiconductor-SS34/C8678
-PinSocket 22P: https://jlcpcb.com/partdetail/Megastar-ZX_PM2_54_122PY/C7499337
+Conector XT30: https://jlcpcb.com/partdetail/Changzhou_AmassElec-XT30UPBM/C428721
 Conector JST-XH: https://jlcpcb.com/partdetail/Jst-B2B_XH_A_LF_SN/C158012
 Pin header 2P: https://jlcpcb.com/partdetail/Xfcn-PZ254V_1102P/C492401
+PinSocket 22P: https://jlcpcb.com/partdetail/Megastar-ZX_PM2_54_122PY/C7499337
 Resistencia 4.7k: https://jlcpcb.com/partdetail/23889-0603WAF4701T5E/C23162
-Resistencia 120R: https://jlcpcb.com/partdetail/23514-0603WAF1200T5E/C22787
+Resistencia 200R: https://jlcpcb.com/partdetail/8708-0603WAF2000T5E/C8218
 Resistencia 1k: https://jlcpcb.com/partdetail/21904-0603WAF1001T5E/C21190
 Resistencia 10k: https://jlcpcb.com/partdetail/26547-0603WAF1002T5E/C25804
+Resistencia 120R: https://jlcpcb.com/partdetail/23514-0603WAF1200T5E/C22787
 SN65HVD230DR: https://jlcpcb.com/partdetail/TexasInstruments-SN65HVD230DR/C12084
 
