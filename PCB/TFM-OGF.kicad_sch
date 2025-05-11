@@ -5383,7 +5383,7 @@
 			)
 		)
 	)
-	(global_label "TxCANDer_G10_2"
+	(global_label "RxCANDer_G09_2"
 		(shape input)
 		(at 203.2 103.124 0)
 		(fields_autoplaced yes)
@@ -5395,7 +5395,7 @@
 		)
 		(uuid "8b949c9c-bd78-4ffc-bfa1-5c4e8ff64ab9")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 221.8485 103.124 0)
+			(at 222.1509 103.124 0)
 			(effects
 				(font
 					(size 1.27 1.27)
