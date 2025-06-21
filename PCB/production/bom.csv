@@ -10,7 +10,6 @@ J2,DSUB-9_Socket_Vertical_P2.77x2.84mm_MountingHoles,1,CAN_Externo,C183530
 "J5, J7",PinSocket_1x22_P2.54mm_Vertical,2,Lado izquierdo,C7499337
 "J6, J8",PinSocket_1x22_P2.54mm_Vertical,2,Lado derecho,C7499337
 J9,JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,1,Led_Pow_Ext,C158012
-PS1,CONV_TSR_1-2450,1,TSR_1-2450,C6886877
 R1,0603,1,4.7K,C23162
 R2,0603,1,1K,C21190
 "R3, R5",0603,2,10K,C25804

@@ -1900,51 +1900,40 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "TSR_1-2450:TSR_1-2450"
-			(pin_names
-				(offset 1.016)
-			)
+		(symbol "Regulator_Switching:TSR_1-2450"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "PS"
-				(at -10.16 7.62 0)
+			(property "Reference" "U"
+				(at -7.62 6.35 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left top)
+					(justify left)
 				)
 			)
 			(property "Value" "TSR_1-2450"
-				(at -10.16 -7.62 0)
+				(at -1.27 6.35 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left bottom)
+					(justify left)
 				)
 			)
-			(property "Footprint" "TSR_1-2450:CONV_TSR_1-2450"
-				(at 0 0 0)
+			(property "Footprint" "Converter_DCDC:Converter_DCDC_TRACO_TSR-1_THT"
+				(at 0 -3.81 0)
 				(effects
 					(font
 						(size 1.27 1.27)
+						(italic yes)
 					)
-					(justify bottom)
+					(justify left)
 					(hide yes)
 				)
 			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
+			(property "Datasheet" "http://www.tracopower.com/products/tsr1.pdf"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1953,130 +1942,37 @@
 					(hide yes)
 				)
 			)
-			(property "MF" "Traco Power"
+			(property "Description" "1A step-down regulator module, fixed 5V output voltage, 5-36V input voltage, -40°C to +85°C temperature range, TO-220 compatible LM78xx replacement"
 				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify bottom)
 					(hide yes)
 				)
 			)
-			(property "MAXIMUM_PACKAGE_HEIGHT" "10.6mm"
+			(property "ki_keywords" "dc-dc traco buck"
 				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify bottom)
 					(hide yes)
 				)
 			)
-			(property "Package" "SIP-3 Traco Power"
+			(property "ki_fp_filters" "Converter*DCDC*TRACO*TSR?1*"
 				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify bottom)
 					(hide yes)
 				)
 			)
-			(property "Price" "None"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Check_prices" "https://www.snapeda.com/parts/TSR%201-2450/Traco+Power/view-part/?ref=eda"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "STANDARD" "Manufacturer Recommendations"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "PARTREV" "Apr 27, 2020"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "SnapEDA_Link" "https://www.snapeda.com/parts/TSR%201-2450/Traco+Power/view-part/?ref=snap"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "MP" "TSR 1-2450"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Description_1" "1 Amp POL switching regulator, wide input range, pos.-pos. circuit, LM78 compatible, SIP-3"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Availability" "In Stock"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "MANUFACTURER" "Traco Power"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(symbol "TSR_1-2450_0_0"
+			(symbol "TSR_1-2450_0_1"
 				(rectangle
-					(start -10.16 -5.08)
-					(end 10.16 5.08)
+					(start -7.62 5.08)
+					(end 7.62 -2.54)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -2085,56 +1981,58 @@
 						(type background)
 					)
 				)
-				(pin input line
-					(at -15.24 2.54 0)
-					(length 5.08)
-					(name "+VIN"
+			)
+			(symbol "TSR_1-2450_1_1"
+				(pin power_in line
+					(at -10.16 2.54 0)
+					(length 2.54)
+					(name "Vin"
 						(effects
 							(font
-								(size 1.016 1.016)
+								(size 1.27 1.27)
 							)
 						)
 					)
 					(number "1"
 						(effects
 							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at 15.24 2.54 180)
-					(length 5.08)
-					(name "+VOUT"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.016 1.016)
+								(size 1.27 1.27)
 							)
 						)
 					)
 				)
 				(pin power_in line
-					(at 15.24 -2.54 180)
-					(length 5.08)
+					(at 0 -5.08 90)
+					(length 2.54)
 					(name "GND"
 						(effects
 							(font
-								(size 1.016 1.016)
+								(size 1.27 1.27)
 							)
 						)
 					)
 					(number "2"
 						(effects
 							(font
-								(size 1.016 1.016)
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 10.16 2.54 180)
+					(length 2.54)
+					(name "Vout"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
 							)
 						)
 					)
@@ -2356,22 +2254,34 @@
 		(uuid "f3d49603-ec43-406c-bdad-767b39aa86f5")
 	)
 	(junction
+		(at 117.094 49.53)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "27287264-c858-4c69-b80c-5517725aa51a")
+	)
+	(junction
+		(at 97.282 35.052)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "28aeed37-e1bc-4827-99cd-8edf47e94e66")
+	)
+	(junction
+		(at 66.548 35.052)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2e23d2dc-93f4-437b-bdf1-89eeffc870bb")
+	)
+	(junction
 		(at 79.756 124.968)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "4dd598c7-42f5-4988-bd26-1c8e26a8d429")
 	)
 	(junction
-		(at 103.886 25.4)
+		(at 97.282 25.4)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "53238300-e1f3-4192-b416-cc7ad1e3594f")
-	)
-	(junction
-		(at 66.548 30.48)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "6434bf4d-1b36-4305-b688-963d1c257c69")
+		(uuid "5d3c6599-5cc7-417c-b300-a624e659e48b")
 	)
 	(junction
 		(at 64.262 114.554)
@@ -2384,6 +2294,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "78cf93ea-535b-44ec-a86f-7c6175565f65")
+	)
+	(junction
+		(at 117.094 42.672)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c293a34c-1c46-4908-8d4a-6011a35f376a")
 	)
 	(junction
 		(at 49.276 85.598)
@@ -2402,12 +2318,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "dfe61e4f-bf6e-4b6a-8fd9-9a4c30b3e38a")
-	)
-	(junction
-		(at 103.886 30.48)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f735bff1-1000-404a-94fc-a3ae33ac7dd1")
 	)
 	(wire
 		(pts
@@ -2428,16 +2338,6 @@
 			(type default)
 		)
 		(uuid "012b935d-4065-45e0-9c32-f601cb6d5647")
-	)
-	(wire
-		(pts
-			(xy 90.678 25.4) (xy 103.886 25.4)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "02faaa7d-b295-4b28-88d5-0afe6717e619")
 	)
 	(wire
 		(pts
@@ -2488,6 +2388,16 @@
 			(type default)
 		)
 		(uuid "04825514-90a4-4565-8da4-95d75c8c6409")
+	)
+	(wire
+		(pts
+			(xy 66.548 35.052) (xy 66.548 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "04b7010d-6731-425c-a4a5-4f5b8e9ad919")
 	)
 	(wire
 		(pts
@@ -2558,16 +2468,6 @@
 			(type default)
 		)
 		(uuid "13096cfe-b4d7-4ed9-8ea8-63b0ec95e6b6")
-	)
-	(wire
-		(pts
-			(xy 66.548 30.48) (xy 66.548 34.544)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "139ef33e-7a9d-4a0d-8a66-400dc25a6963")
 	)
 	(wire
 		(pts
@@ -2731,16 +2631,6 @@
 	)
 	(wire
 		(pts
-			(xy 66.548 25.4) (xy 66.548 30.48)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "30461819-4637-4690-bdc1-24976c701ed4")
-	)
-	(wire
-		(pts
 			(xy 37.084 48.26) (xy 37.084 43.434)
 		)
 		(stroke
@@ -2768,6 +2658,16 @@
 			(type default)
 		)
 		(uuid "31bf26ec-7c21-4b14-a169-d47c7dda2cfe")
+	)
+	(wire
+		(pts
+			(xy 117.094 25.4) (xy 117.094 42.672)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3230cb45-90b3-4f01-9c99-c1837a50af4c")
 	)
 	(wire
 		(pts
@@ -2831,6 +2731,16 @@
 	)
 	(wire
 		(pts
+			(xy 101.346 25.4) (xy 97.282 25.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "38e962e5-aa62-4797-92ad-1998d581a621")
+	)
+	(wire
+		(pts
 			(xy 138.43 107.188) (xy 139.192 107.188)
 		)
 		(stroke
@@ -2861,16 +2771,6 @@
 	)
 	(wire
 		(pts
-			(xy 101.346 35.56) (xy 107.696 35.56)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3df9e4d4-6943-417a-bd2c-21eb4e032bda")
-	)
-	(wire
-		(pts
 			(xy 49.276 60.96) (xy 49.276 65.786)
 		)
 		(stroke
@@ -2881,13 +2781,13 @@
 	)
 	(wire
 		(pts
-			(xy 121.666 25.4) (xy 120.396 25.4)
+			(xy 117.094 49.53) (xy 119.38 49.53)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "3ed6d31c-7be5-48c3-b0cc-b246a0d80742")
+		(uuid "400dd001-362b-42c7-b90c-4d2575bcc738")
 	)
 	(wire
 		(pts
@@ -2908,6 +2808,16 @@
 			(type default)
 		)
 		(uuid "4118b92c-4425-4893-adc4-10b9f86489de")
+	)
+	(wire
+		(pts
+			(xy 82.296 42.672) (xy 117.094 42.672)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "448521e5-f624-4ee4-a493-ddf92069e209")
 	)
 	(wire
 		(pts
@@ -2981,16 +2891,6 @@
 	)
 	(wire
 		(pts
-			(xy 101.346 30.48) (xy 103.886 30.48)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "513a2426-860a-4176-8d7e-dfea50a68031")
-	)
-	(wire
-		(pts
 			(xy 203.2 80.264) (xy 202.438 80.264)
 		)
 		(stroke
@@ -3048,6 +2948,16 @@
 			(type default)
 		)
 		(uuid "5b6010e7-478a-4d00-9450-053debe9f2a7")
+	)
+	(wire
+		(pts
+			(xy 97.282 25.4) (xy 97.282 35.052)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5c5d3a3c-4ed1-4068-bd72-07cd7732265f")
 	)
 	(wire
 		(pts
@@ -3171,13 +3081,13 @@
 	)
 	(wire
 		(pts
-			(xy 103.886 30.48) (xy 107.696 30.48)
+			(xy 92.456 35.052) (xy 97.282 35.052)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "6e98ef4f-6d9d-45aa-8521-42484cc25e1e")
+		(uuid "7314d008-2c4d-4b6f-a552-77d8339e27b9")
 	)
 	(wire
 		(pts
@@ -3251,7 +3161,7 @@
 	)
 	(wire
 		(pts
-			(xy 96.774 47.752) (xy 98.044 47.752)
+			(xy 90.17 49.53) (xy 117.094 49.53)
 		)
 		(stroke
 			(width 0)
@@ -3311,6 +3221,16 @@
 	)
 	(wire
 		(pts
+			(xy 73.66 49.53) (xy 66.548 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "84b862f5-9de6-43d7-bb4e-664038ab17bf")
+	)
+	(wire
+		(pts
 			(xy 241.808 105.918) (xy 242.57 105.918)
 		)
 		(stroke
@@ -3331,13 +3251,13 @@
 	)
 	(wire
 		(pts
-			(xy 65.786 30.48) (xy 66.548 30.48)
+			(xy 97.282 35.052) (xy 110.49 35.052)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "8b7eb776-8f6a-40f6-b975-512a86c8991c")
+		(uuid "8ab9b571-bd71-4193-b27c-87346a65e35e")
 	)
 	(wire
 		(pts
@@ -3361,7 +3281,7 @@
 	)
 	(wire
 		(pts
-			(xy 111.506 25.4) (xy 112.776 25.4)
+			(xy 108.966 25.4) (xy 109.474 25.4)
 		)
 		(stroke
 			(width 0)
@@ -3461,6 +3381,16 @@
 	)
 	(wire
 		(pts
+			(xy 66.548 25.4) (xy 66.548 35.052)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "98632753-56d0-4314-8995-826546166129")
+	)
+	(wire
+		(pts
 			(xy 242.57 70.358) (xy 241.808 70.358)
 		)
 		(stroke
@@ -3521,17 +3451,7 @@
 	)
 	(wire
 		(pts
-			(xy 66.548 47.752) (xy 89.154 47.752)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a5bc6af9-80f9-4e9c-98ca-f68836deebbc")
-	)
-	(wire
-		(pts
-			(xy 83.058 25.4) (xy 66.548 25.4)
+			(xy 78.994 25.4) (xy 66.548 25.4)
 		)
 		(stroke
 			(width 0)
@@ -3671,6 +3591,16 @@
 	)
 	(wire
 		(pts
+			(xy 66.548 35.052) (xy 72.136 35.052)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "be74b364-8d30-43dc-bc35-d69fce95d7da")
+	)
+	(wire
+		(pts
 			(xy 59.436 114.554) (xy 64.262 114.554)
 		)
 		(stroke
@@ -3688,6 +3618,16 @@
 			(type default)
 		)
 		(uuid "c0c768e9-765d-4ccc-9437-a19950d257d0")
+	)
+	(wire
+		(pts
+			(xy 81.28 49.53) (xy 82.55 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c1270b70-26f3-4688-9e4a-d68513a1838a")
 	)
 	(wire
 		(pts
@@ -3731,16 +3671,6 @@
 	)
 	(wire
 		(pts
-			(xy 103.886 25.4) (xy 103.886 30.48)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c50360d1-4a86-4247-bd64-62d8d132a606")
-	)
-	(wire
-		(pts
 			(xy 161.036 117.348) (xy 161.798 117.348)
 		)
 		(stroke
@@ -3758,6 +3688,16 @@
 			(type default)
 		)
 		(uuid "ca5e3d4c-1d9a-49c3-a041-60bbf2da9bda")
+	)
+	(wire
+		(pts
+			(xy 117.094 42.672) (xy 117.094 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cbf49c41-7ff0-42fc-8a65-b4220d9e56f2")
 	)
 	(wire
 		(pts
@@ -3781,13 +3721,13 @@
 	)
 	(wire
 		(pts
-			(xy 66.548 42.164) (xy 66.548 47.752)
+			(xy 65.532 35.052) (xy 66.548 35.052)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d1a7afbf-f5b0-4755-84ec-176b09a4e005")
+		(uuid "d0f80cee-d64a-402f-ab26-5cdec4b05536")
 	)
 	(wire
 		(pts
@@ -3891,16 +3831,6 @@
 	)
 	(wire
 		(pts
-			(xy 66.548 30.48) (xy 70.866 30.48)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e87aa8a9-6faa-4080-8470-b1172f0cb164")
-	)
-	(wire
-		(pts
 			(xy 139.192 81.788) (xy 138.43 81.788)
 		)
 		(stroke
@@ -3908,6 +3838,16 @@
 			(type default)
 		)
 		(uuid "e97cc4ff-aa0e-46db-a8d9-2b486db7cd18")
+	)
+	(wire
+		(pts
+			(xy 86.614 25.4) (xy 97.282 25.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ec714db8-b924-4550-9554-ef9a4f0e51d6")
 	)
 	(wire
 		(pts
@@ -4219,28 +4159,6 @@
 	)
 	(global_label "GND"
 		(shape input)
-		(at 121.666 25.4 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "12a33438-7d06-453d-b0e1-b949724151dd")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 128.5217 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "GND"
-		(shape input)
 		(at 161.798 119.888 0)
 		(fields_autoplaced yes)
 		(effects
@@ -4483,7 +4401,7 @@
 	)
 	(global_label "Vin"
 		(shape input)
-		(at 65.786 30.48 180)
+		(at 65.532 35.052 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4493,7 +4411,7 @@
 		)
 		(uuid "3061bd80-315d-44fa-ae54-f0edbbce9a16")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 59.9584 30.48 0)
+			(at 59.7044 35.052 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4967,7 +4885,7 @@
 	)
 	(global_label "GND"
 		(shape input)
-		(at 98.044 47.752 0)
+		(at 119.38 49.53 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4977,7 +4895,7 @@
 		)
 		(uuid "621d1d13-7cb8-4865-bab2-07ef163ca7f9")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 104.8997 47.752 0)
+			(at 126.2357 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5581,28 +5499,6 @@
 			)
 		)
 	)
-	(global_label "GND"
-		(shape input)
-		(at 107.696 35.56 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "965dacbe-c15a-4428-b4cf-44122b133383")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 114.5517 35.56 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-	)
 	(global_label "3.3V_2"
 		(shape input)
 		(at 54.102 102.108 0)
@@ -6001,7 +5897,7 @@
 	)
 	(global_label "5V"
 		(shape input)
-		(at 107.696 30.48 0)
+		(at 110.49 35.052 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6011,7 +5907,7 @@
 		)
 		(uuid "c26a1dd7-a0cf-4075-b24f-0a3e1bf6f61b")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 112.9793 30.48 0)
+			(at 115.7733 35.052 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6572,197 +6468,6 @@
 		)
 	)
 	(symbol
-		(lib_id "TSR_1-2450:TSR_1-2450")
-		(at 86.106 33.02 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "0bb40c52-eba6-4a19-a09f-cfbc755f6a1c")
-		(property "Reference" "PS1"
-			(at 83.058 33.782 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "TSR_1-2450"
-			(at 83.312 36.322 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "TSR_1-2450:CONV_TSR_1-2450"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MF" "Traco Power"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MAXIMUM_PACKAGE_HEIGHT" "10.6mm"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Package" "SIP-3 Traco Power"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Price" "None"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Check_prices" "https://www.snapeda.com/parts/TSR%201-2450/Traco+Power/view-part/?ref=eda"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "STANDARD" "Manufacturer Recommendations"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "PARTREV" "Apr 27, 2020"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "SnapEDA_Link" "https://www.snapeda.com/parts/TSR%201-2450/Traco+Power/view-part/?ref=snap"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MP" "TSR 1-2450"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Description_1" "1 Amp POL switching regulator, wide input range, pos.-pos. circuit, LM78 compatible, SIP-3"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Availability" "In Stock"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MANUFACTURER" "Traco Power"
-			(at 86.106 33.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "9bdb43b1-a443-4ee9-9a76-7a73f11d3f5c")
-		)
-		(pin "3"
-			(uuid "cc690c5e-e156-438e-8f13-56e7d2b0653b")
-		)
-		(pin "1"
-			(uuid "8fa59a34-6366-442b-9d33-f9fe8272fcfe")
-		)
-		(instances
-			(project ""
-				(path "/41b37644-2050-448d-bbd4-fcd0da7fc3d1"
-					(reference "PS1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Connector_Generic:Conn_01x22")
 		(at 236.728 95.758 180)
 		(unit 1)
@@ -6891,7 +6596,7 @@
 	)
 	(symbol
 		(lib_id "Device:D_Schottky_Filled")
-		(at 86.868 25.4 0)
+		(at 82.804 25.4 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6899,7 +6604,7 @@
 		(dnp no)
 		(uuid "1ddc5059-637f-4193-9237-b0520ecbe00d")
 		(property "Reference" "D3"
-			(at 80.01 24.384 0)
+			(at 75.946 24.384 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6907,7 +6612,7 @@
 			)
 		)
 		(property "Value" "ProtecciónInput5V"
-			(at 90.17 22.86 0)
+			(at 86.106 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6915,7 +6620,7 @@
 			)
 		)
 		(property "Footprint" "Diode_SMD:D_SMA_Handsoldering"
-			(at 86.868 25.4 0)
+			(at 82.804 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6924,7 +6629,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 86.868 25.4 0)
+			(at 82.804 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6933,7 +6638,7 @@
 			)
 		)
 		(property "Description" "Schottky diode, filled shape"
-			(at 86.868 25.4 0)
+			(at 82.804 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7573,7 +7278,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 107.696 25.4 90)
+		(at 105.156 25.4 90)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -7582,7 +7287,7 @@
 		(dnp no)
 		(uuid "5ae44b5f-9ad9-4065-a175-5460bc95b937")
 		(property "Reference" "R2"
-			(at 107.696 23.114 90)
+			(at 105.156 23.114 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7590,7 +7295,7 @@
 			)
 		)
 		(property "Value" "1K"
-			(at 107.696 27.686 90)
+			(at 105.156 27.686 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7598,7 +7303,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 107.696 23.622 90)
+			(at 105.156 23.622 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7607,7 +7312,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 107.696 25.4 0)
+			(at 105.156 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7616,7 +7321,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 107.696 25.4 0)
+			(at 105.156 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7709,7 +7414,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 66.548 38.354 0)
+		(at 77.47 49.53 270)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -7718,7 +7423,7 @@
 		(dnp no)
 		(uuid "664f0262-b871-417e-bb6c-e2e29aba691c")
 		(property "Reference" "R1"
-			(at 64.008 38.354 90)
+			(at 77.47 52.07 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7726,7 +7431,7 @@
 			)
 		)
 		(property "Value" "4.7K"
-			(at 68.834 38.608 90)
+			(at 77.724 47.244 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7734,7 +7439,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 64.77 38.354 90)
+			(at 77.47 51.308 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7743,7 +7448,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 66.548 38.354 0)
+			(at 77.47 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7752,7 +7457,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 66.548 38.354 0)
+			(at 77.47 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8137,7 +7842,7 @@
 	)
 	(symbol
 		(lib_id "Device:LED")
-		(at 92.964 47.752 180)
+		(at 86.36 49.53 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -8145,7 +7850,7 @@
 		(dnp no)
 		(uuid "a63e5eb4-1921-4764-8270-421aff208356")
 		(property "Reference" "D1"
-			(at 93.98 42.672 0)
+			(at 87.376 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8153,7 +7858,7 @@
 			)
 		)
 		(property "Value" "PowerIN"
-			(at 94.996 44.45 0)
+			(at 88.392 46.228 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8161,7 +7866,7 @@
 			)
 		)
 		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
-			(at 92.964 47.752 0)
+			(at 86.36 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8170,7 +7875,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 92.964 47.752 0)
+			(at 86.36 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8179,7 +7884,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 92.964 47.752 0)
+			(at 86.36 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8466,7 +8171,7 @@
 	)
 	(symbol
 		(lib_id "Device:LED")
-		(at 116.586 25.4 180)
+		(at 113.284 25.4 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -8474,7 +8179,7 @@
 		(dnp no)
 		(uuid "cd7c97b4-3fa4-4c07-877e-c024bd5a835e")
 		(property "Reference" "D2"
-			(at 115.062 19.812 0)
+			(at 111.76 19.812 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8482,7 +8187,7 @@
 			)
 		)
 		(property "Value" "Power5V"
-			(at 117.348 21.844 0)
+			(at 114.046 21.844 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8490,7 +8195,7 @@
 			)
 		)
 		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
-			(at 116.586 25.4 0)
+			(at 113.284 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8499,7 +8204,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 116.586 25.4 0)
+			(at 113.284 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8508,7 +8213,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 116.586 25.4 0)
+			(at 113.284 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8526,6 +8231,78 @@
 			(project "TFM-OGF"
 				(path "/41b37644-2050-448d-bbd4-fcd0da7fc3d1"
 					(reference "D2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Regulator_Switching:TSR_1-2450")
+		(at 82.296 37.592 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "d3d3a881-3a1a-4929-a568-c84a706c496a")
+		(property "Reference" "U3"
+			(at 82.296 29.718 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TSR_1-2450"
+			(at 82.296 31.242 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Converter_DCDC:Converter_DCDC_TRACO_TSR-1_THT"
+			(at 82.296 41.402 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.tracopower.com/products/tsr1.pdf"
+			(at 82.296 37.592 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "1A step-down regulator module, fixed 5V output voltage, 5-36V input voltage, -40°C to +85°C temperature range, TO-220 compatible LM78xx replacement"
+			(at 82.296 37.592 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "d3917ecd-75a0-4e06-a9c0-7d6d7422d46c")
+		)
+		(pin "1"
+			(uuid "c3c4c55b-5d04-4a56-a469-cd541b7b4cba")
+		)
+		(pin "2"
+			(uuid "ac9179b8-78e1-46f5-a5c3-48f100e6d8c7")
+		)
+		(instances
+			(project ""
+				(path "/41b37644-2050-448d-bbd4-fcd0da7fc3d1"
+					(reference "U3")
 					(unit 1)
 				)
 			)
