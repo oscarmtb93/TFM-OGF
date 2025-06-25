@@ -1,0 +1,35 @@
+#include <Arduino.h>
+#include <math.h>
+
+// Hilo de carga pesada para CPU
+void hiloProcesamiento(void *param)
+{
+  while (true)
+  {
+    volatile double x = 0;
+    for (long i = 0; i < 10000000; i++)
+    {
+      x += sin(i) * cos(i); // Operaciones con FPU
+    }
+  }
+}
+
+void setup()
+{
+  // Inicializa el puerto serie solo para pruebas con USB
+  Serial.begin(115200);
+  Serial.println("Iniciando test de consumo máximo...");
+
+  // Inicia tareas pesadas en ambos núcleos
+  xTaskCreatePinnedToCore(hiloProcesamiento, "Core0Task", 4096, NULL, 1, NULL, 0);
+  xTaskCreatePinnedToCore(hiloProcesamiento, "Core1Task", 4096, NULL, 1, NULL, 1);
+}
+
+void loop()
+{
+  volatile double x = 0;
+  for (long i = 0; i < 10000000; i++)
+  {
+    x += sin(i) * cos(i); // Operaciones con FPU
+  }
+}
