@@ -1,41 +1,46 @@
 #include <Arduino.h>
 
+/*
+El siguiente sketch es el código para analizar la
+latencia en una red CAN cifrada.
+
+v1.0 - ESP32-S3
+*/
+
 #define IZQ // Si está definido, el código serña el ESP32 del lado izquierdo
 // #define DER // Si está definido, el código serña el ESP32 del lado derecho
-
-/*
-El siguiente sketch es el código de la mplaca de control
-de los mandos de los cepillos de la barredora de FCC.
-
-v2.0 - ESP32-C6
-*/
 
 #include "driver/twai.h"
 
 const unsigned long BAUDRATE = 115200;
-const twai_timing_config_t BITRATE_CAN = TWAI_TIMING_CONFIG_500KBITS(); // Bitrate del CAN que conecta con control
-
-#ifdef IZQ                             // Los pines para el transceptor CAN del lado izquierdo
-const gpio_num_t txCtrl = GPIO_NUM_45; // Pin TxCAN del CAN
-const gpio_num_t rxCtrl = GPIO_NUM_48; // Pin RxCAN del CAN
-#endif
-#ifdef DER                             // Los pines para el transceptor CAN del lado derecho
-const gpio_num_t txCtrl = GPIO_NUM_10; // Pin TxCAN del CAN
-const gpio_num_t rxCtrl = GPIO_NUM_9;  // Pin RxCAN del CAN
-#endif
 
 // Variables mensajes CAN
-const bool CAN_EXTENDIDO = false; // Si es true, es CAN extendido; si es false, es estándar
+const twai_timing_config_t BITRATE_CAN = TWAI_TIMING_CONFIG_500KBITS(); // Bitrate de la línea CAN
+const bool CAN_EXTENDIDO = false;                                       // Si es true, es CAN extendido; si es false, es estándar
 const uint32_t MASCARA_EXTENDIDO = 0x1FFFFFFF;
 const uint32_t MASCARA_ESTANDAR = 0x7FF;
 const uint8_t SIZE_DLC = 8;
 const uint32_t idCanDownloadRequest = 0x100;
-twai_message_t mensajeCAN = {
+twai_message_t mensajeCANTransmitido = {
     .flags = 0, // Inicializa toda la unión a 0
     .identifier = idCanDownloadRequest,
-    .data_length_code = 8,
+    .data_length_code = SIZE_DLC,
     .data = {0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00}};
 twai_message_t mensajeCANLeido;
+// Número de repeticiones de cada prueba
+const uint8_t NUM_REP = 100;
+
+#ifdef IZQ                             // Los pines para el transceptor CAN del lado izquierdo
+const gpio_num_t txCtrl = GPIO_NUM_45; // Pin TxCAN del CAN
+const gpio_num_t rxCtrl = GPIO_NUM_48; // Pin RxCAN del CAN
+unsigned long tiempoInicial, tiempoFinal, tiempoTranscurrido[NUM_REP], sumatorio;
+double media;
+#endif
+#ifdef DER                             // Los pines para el transceptor CAN del lado derecho
+const gpio_num_t txCtrl = GPIO_NUM_10; // Pin TxCAN del CAN
+const gpio_num_t rxCtrl = GPIO_NUM_9;  // Pin RxCAN del CAN
+uint8_t datosRecibidos[SIZE_DLC];
+#endif
 
 void setup()
 {
@@ -86,15 +91,67 @@ void setup()
 
 void loop()
 {
-#ifdef IZQ                                         // El código para el ESP32 del lado izquierdo
-  twai_transmit(&mensajeCAN, pdMS_TO_TICKS(1000)); // Enviar el mensaje CAN
-  Serial.println("He enviado un mensaje de CAN");
+#ifdef IZQ // El código para el ESP32 del lado izquierdo
+  // Con esto damos tiempo a que se inicie el ESP32 derecho
   delay(1000);
-#endif
-#ifdef DER                                                        // El código para el ESP32 del lado derecho
-  if (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) == ESP_OK) // Cuando recibo un mensaje de CAN
+  // Iniciamos la fase de enviar mensajes sin cifrar
+  for (uint8_t i = 0; i < NUM_REP; i++)
   {
-    Serial.println("He recibido un mensaje de CAN");
+    // Inicio el contador
+    tiempoInicial = micros();
+    // Rellenamos el campo de datos a enviar
+    for (uint8_t i = 0; i < SIZE_DLC; i++)
+    {
+      mensajeCANTransmitido.data[i] = i;
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    // Esperamos a que nos llegue el mensaje de vuelta
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Momento que finalizamos la cuenta
+    tiempoFinal = micros();
+    // Tiempo empleado en el proceso
+    tiempoTranscurrido[i] = tiempoFinal - tiempoInicial;
   }
+  // Mostramos cuánto se ha tardado en cada iteración y la media
+  sumatorio = 0;
+  for (uint8_t i = 0; i < NUM_REP; i++)
+  {
+    Serial.print(tiempoTranscurrido[i]);
+    Serial.print(" ");
+    sumatorio += tiempoTranscurrido[i];
+  }
+  media = (double)sumatorio / NUM_REP;
+  Serial.print("\nLa media del envío de datos sin cifrar ha sido: ");
+  Serial.print(media);
+  Serial.println(" us");
+  // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
+  Serial.println("Fin de la ejecución del ESP32 izquierdo");
+  esp_deep_sleep_start();
+#endif
+#ifdef DER // El código para el ESP32 del lado derecho
+  // Iniciamos la fase de recibir mensajes sin cifrar
+  for (uint8_t i = 0; i < NUM_REP; i++)
+  {
+    // Esperamos a que nos llegue el primer mensaje
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Leemos el campo de datos recibido
+    for (uint8_t i = 0; i < SIZE_DLC; i++)
+    {
+      datosRecibidos[i] = mensajeCANLeido.data[i];
+    }
+    // Rellenamos el campo de datos a enviar
+    for (uint8_t i = 0; i < SIZE_DLC; i++)
+    {
+      mensajeCANTransmitido.data[i] = datosRecibidos[i];
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+  }
+  Serial.println("Fin de la ejecución del ESP32 derecho");
 #endif
 }
