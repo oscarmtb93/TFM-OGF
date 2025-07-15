@@ -1,0 +1,46 @@
+#include <Arduino.h>
+
+const unsigned long BAUDRATE = 115200;
+const uint8_t LONGITUD_128 = 16;
+const uint8_t LONGITUD_192 = 24;
+const uint8_t LONGITUD_256 = 32;
+uint8_t claveAES128[LONGITUD_128];
+uint8_t claveAES192[LONGITUD_192];
+uint8_t claveAES256[LONGITUD_256];
+
+void setup()
+{
+  Serial.begin(BAUDRATE);
+  // Creo e imprimo la clave de 128 bits para AES
+  esp_fill_random(claveAES128, sizeof(claveAES128)); // Llena con aleatorio del RNG de hardware
+  Serial.println("Clave de AES-128:");
+  for (uint8_t i = 0; i < LONGITUD_128; i++)
+  {
+    Serial.print(claveAES128[i], HEX);
+    Serial.print(", 0x");
+  }
+  Serial.println("\n");
+  // Creo e imprimo la clave de 192 bits para AES
+  esp_fill_random(claveAES192, sizeof(claveAES192)); // Llena con aleatorio del RNG de hardware
+  Serial.println("Clave de AES-192:");
+  for (uint8_t i = 0; i < LONGITUD_192; i++)
+  {
+    Serial.print(claveAES192[i], HEX);
+    Serial.print(", 0x");
+  }
+  Serial.println("\n");
+  // Creo e imprimo la clave de 256 bits para AES
+  esp_fill_random(claveAES256, sizeof(claveAES256)); // Llena con aleatorio del RNG de hardware
+  Serial.println("Clave de AES-256:");
+  for (uint8_t i = 0; i < LONGITUD_256; i++)
+  {
+    Serial.print(claveAES256[i], HEX);
+    Serial.print(", 0x");
+  }
+  Serial.println();
+}
+
+void loop()
+{
+  esp_deep_sleep_start();
+}
