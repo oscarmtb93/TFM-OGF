@@ -20,10 +20,16 @@ const bool CAN_EXTENDIDO = false;                                       // Si es
 const uint32_t MASCARA_EXTENDIDO = 0x1FFFFFFF;
 const uint32_t MASCARA_ESTANDAR = 0x7FF;
 const uint8_t SIZE_DLC = 8;
-const uint32_t idCanDownloadRequest = 0x100;
+const uint32_t idCanTransmiteIzq = 0x100;
+const uint32_t idCanTransmiteDer = 0x101;
 twai_message_t mensajeCANTransmitido = {
     .flags = 0, // Inicializa toda la unión a 0
-    .identifier = idCanDownloadRequest,
+#ifdef IZQ      // El lado izquierdo transmite en un mensaje
+    .identifier = idCanTransmiteIzq,
+#endif
+#ifdef DER // El lado derecho transmite en otro mensaje
+    .identifier = idCanTransmiteDer,
+#endif
     .data_length_code = SIZE_DLC,
     .data = {0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00}};
 twai_message_t mensajeCANLeido;
@@ -63,10 +69,15 @@ void setup()
     mascara = MASCARA_ESTANDAR;
     desplazamiento = 21;
   }
-  acceptance_code = idCanDownloadRequest << desplazamiento;
+#ifdef IZQ // El lado izquierdo recibe en un mensaje
+  acceptance_code = idCanTransmiteDer << desplazamiento;
+#endif
+#ifdef DER // El lado derecho recibe en otro mensaje
+  acceptance_code = idCanTransmiteIzq << desplazamiento;
+#endif
   acceptance_mask = ~(mascara << desplazamiento);
   twai_filter_config_t filter_config = {
-      .acceptance_code = acceptance_code, // Filtro para ID idCanDownloadRequest
+      .acceptance_code = acceptance_code, // Filtro para ID idCan
       .acceptance_mask = acceptance_mask, // Máscara para ID estándar (11 bits)
       .single_filter = true               // Usa un solo filtro
   };
