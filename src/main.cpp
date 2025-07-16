@@ -12,11 +12,15 @@ v1.0 - ESP32-S3
 
 // Librería para utilizar el controlador CAN del ESP32
 #include "driver/twai.h"
-// Librería para utilizar el cifrado integrado en el ESP32
+// Librerías para utilizar el cifrado y firma integrados en el ESP32
 #include <mbedtls/aes.h>
+#include <mbedtls/sha1.h>
 
 const unsigned long BAUDRATE = 115200;
+
+// Constantes para el cifrado AES
 const uint8_t LONGITUD_MENSAJE_AES = 16;
+const uint8_t MENSAJES_AES = 2;
 const uint8_t LONGITUD_128 = 128;
 const uint16_t LONGITUD_256 = 256;
 const uint8_t claveAES128[LONGITUD_128 / 8] = {
@@ -27,6 +31,10 @@ const uint8_t claveAES256[LONGITUD_256 / 8] = {
     0xE4, 0x53, 0x5A, 0x03, 0x38, 0x0F, 0x2C, 0x0B,
     0xFA, 0xCC, 0xB6, 0x5D, 0x1F, 0x0D, 0x5E, 0x06,
     0x8D, 0x56, 0x71, 0xE9, 0xB9, 0xEE, 0xD6, 0x25};
+
+// Constantes para la firma SHA
+const uint8_t LONGITUD_SHA1 = 20;
+const uint8_t MENSAJES_SHA1 = 3;
 
 // Variables mensajes CAN
 const twai_timing_config_t BITRATE_CAN = TWAI_TIMING_CONFIG_500KBITS(); // Bitrate de la línea CAN
@@ -50,11 +58,13 @@ twai_message_t mensajeCANLeido;
 // Número de repeticiones de cada prueba
 const uint8_t NUM_REP = 100;
 
-// Variables para el cifrado
+// Variables para el cifrado AES
 mbedtls_aes_context cifradorAES;
 uint8_t mensajeCifradoAES[LONGITUD_MENSAJE_AES];
-const uint8_t MENSAJES_AES = LONGITUD_MENSAJE_AES / LONGITUD_MENSAJE_CAN;
-twai_message_t mensajesCanLeidosAES[MENSAJES_AES];
+
+// Variables para el hash SHA-1
+mbedtls_sha1_context contextoSHA1;
+uint8_t sha1Generado[LONGITUD_SHA1];
 
 #ifdef IZQ                             // Los pines para el transceptor CAN del lado izquierdo
 const gpio_num_t txCtrl = GPIO_NUM_45; // Pin TxCAN del CAN
@@ -67,7 +77,10 @@ uint8_t entradaCifradoAES[LONGITUD_MENSAJE_AES];
 const gpio_num_t txCtrl = GPIO_NUM_10; // Pin TxCAN del CAN
 const gpio_num_t rxCtrl = GPIO_NUM_9;  // Pin RxCAN del CAN
 uint8_t datosRecibidos[LONGITUD_MENSAJE_CAN];
+twai_message_t mensajesCanLeidosAES[MENSAJES_AES];
 uint8_t salidaDescifradoAES[LONGITUD_MENSAJE_AES];
+twai_message_t mensajesCanLeidosSHA1[MENSAJES_SHA1];
+uint8_t sha1Recibido[LONGITUD_SHA1];
 #endif
 
 void setup()
@@ -155,14 +168,11 @@ void loop()
   sumatorio = 0;
   for (uint8_t i = 0; i < NUM_REP; i++)
   {
-    Serial.print(tiempoTranscurrido[i]);
-    Serial.print(" ");
+    Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
   media = (double)sumatorio / NUM_REP;
-  Serial.print("\nLa media del envío de datos sin cifrar ha sido: ");
-  Serial.print(media);
-  Serial.println(" us");
+  Serial.printf("\nLa media del envío de datos sin cifrar ha sido: %f us\n", media);
 
   // Empezamos con el cifrado AES-128
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -209,14 +219,11 @@ void loop()
   sumatorio = 0;
   for (uint8_t i = 0; i < NUM_REP; i++)
   {
-    Serial.print(tiempoTranscurrido[i]);
-    Serial.print(" ");
+    Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
   media = (double)sumatorio / NUM_REP;
-  Serial.print("\nLa media del envío de datos cifrados con AES-128 ha sido: ");
-  Serial.print(media);
-  Serial.println(" us");
+  Serial.printf("\nLa media del envío de datos cifrados con AES-128 ha sido: %f us\n", media);
 
   // Empezamos con el cifrado AES-256
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -263,14 +270,78 @@ void loop()
   sumatorio = 0;
   for (uint8_t i = 0; i < NUM_REP; i++)
   {
-    Serial.print(tiempoTranscurrido[i]);
-    Serial.print(" ");
+    Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
   media = (double)sumatorio / NUM_REP;
-  Serial.print("\nLa media del envío de datos cifrados con AES-256 ha sido: ");
-  Serial.print(media);
-  Serial.println(" us");
+  Serial.printf("\nLa media del envío de datos cifrados con AES-256 ha sido: %f us\n", media);
+
+  // Empezamos con la firma SHA-1
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    // Inicio el contador
+    tiempoInicial = micros();
+    // Rellenamos el campo de datos a enviar para que luego el receptor tenga la referencia
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      mensajeCANTransmitido.data[i] = i;
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    // Realizamos el hash con SHA-1
+    mbedtls_sha1_init(&contextoSHA1); // Inicializamos el contexto SHA-1
+    mbedtls_sha1_starts_ret(&contextoSHA1);
+    mbedtls_sha1_update_ret(&contextoSHA1, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se puede hacer con strlen((char*)entradaSHA1)
+    mbedtls_sha1_finish_ret(&contextoSHA1, sha1Generado);
+    mbedtls_sha1_free(&contextoSHA1); // Limpiamos el contexto SHA-1
+    // Rellenamos los dos mensajes a enviar
+    for (uint8_t i = 0; i < MENSAJES_SHA1 - 1; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        mensajeCANTransmitido.data[j] = sha1Generado[j + i * LONGITUD_MENSAJE_CAN];
+      }
+      // Enviar el mensaje CAN
+      twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    }
+    // Esto es porque no rellenamos entero el último mensaje de SHA1 porque 20 no es múltiplo de 8
+    for (uint8_t j = 0; j < 4; j++)
+    {
+      mensajeCANTransmitido.data[j] = sha1Generado[j + 2 * LONGITUD_MENSAJE_CAN];
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    // Esperamos a que nos llegue el mensaje de vuelta
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Momento que finalizamos la cuenta
+    tiempoFinal = micros();
+    // Tiempo empleado en el proceso
+    if (k > 0)
+    {
+      tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
+    }
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien la firma
+    if (mensajeCANLeido.data[0] == 0x00)
+    {
+      Serial.printf("En la iteración %d la firma SHA1 ha ido BIEN\n", k);
+    }
+    else
+    {
+      Serial.printf("En la iteración %d la firma SHA1 ha ido MAL\n", k);
+    }
+    */
+  }
+  // Mostramos cuánto se ha tardado en cada iteración y la media
+  sumatorio = 0;
+  for (uint8_t i = 0; i < NUM_REP; i++)
+  {
+    Serial.printf("%d ", tiempoTranscurrido[i]);
+    sumatorio += tiempoTranscurrido[i];
+  }
+  media = (double)sumatorio / NUM_REP;
+  Serial.printf("\nLa media del envío de datos firmados con SHA-1 ha sido: %f us\n", media);
 
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 izquierdo");
@@ -364,6 +435,83 @@ void loop()
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
   }
   Serial.println("Recibidos todos los mensajes cifrados con AES-256");
+
+  // Iniciamos la fase de recibir mensajes firmados con SHA1
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    // Esperamos a que nos llegue el primer mensaje
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Leemos el campo de datos recibido
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      datosRecibidos[i] = mensajeCANLeido.data[i];
+    }
+    for (uint8_t i = 0; i < MENSAJES_SHA1; i++)
+    {
+      // Esperamos a que nos llegue los mensajes con la firma
+      while (twai_receive(&mensajesCanLeidosSHA1[i], pdMS_TO_TICKS(0)) != ESP_OK)
+      {
+      }
+    }
+    // Leemos el campo de datos recibido con la firma
+    for (uint8_t i = 0; i < MENSAJES_SHA1 - 1; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        sha1Recibido[j + i * LONGITUD_MENSAJE_CAN] = mensajesCanLeidosSHA1[i].data[j];
+      }
+    }
+    // Esto es porque no rellenamos entero el último mensaje de SHA1 porque 20 no es múltiplo de 8
+    for (uint8_t j = 0; j < 4; j++)
+    {
+      sha1Recibido[j + 2 * LONGITUD_MENSAJE_CAN] = mensajesCanLeidosSHA1[2].data[j];
+    }
+    // Realizamos el hash del mensaje recibido inicialmente
+    mbedtls_sha1_init(&contextoSHA1); // Inicializamos el contexto SHA-1
+    mbedtls_sha1_starts_ret(&contextoSHA1);
+    mbedtls_sha1_update_ret(&contextoSHA1, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se puede hacer con strlen((char*)entradaSHA1)
+    mbedtls_sha1_finish_ret(&contextoSHA1, sha1Generado);
+    mbedtls_sha1_free(&contextoSHA1); // Limpiamos el contexto SHA-1
+    /* Estas líneas comentadas fueron de debug para comprobar la firma recibida y generada
+    if (k == 0)
+    {
+      Serial.print("sha1Generado: ");
+      for (uint8_t i = 0; i < LONGITUD_SHA1; i++)
+      {
+        Serial.printf("%x ", sha1Generado[i]);
+      }
+      Serial.println();
+      Serial.print("sha1Recibido: ");
+      for (uint8_t i = 0; i < LONGITUD_SHA1; i++)
+      {
+        Serial.printf("%x ", sha1Recibido[i]);
+      }
+      Serial.println();
+    }
+    */
+    // Ahora comparamos la firma calculada con la firma recibida
+    if (memcmp(sha1Recibido, sha1Generado, LONGITUD_SHA1) == 0)
+    {
+      // Rellenamos el campo de datos a enviar con los datos originales
+      for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+      {
+        mensajeCANTransmitido.data[i] = datosRecibidos[i];
+      }
+    }
+    else
+    {
+      // Rellenamos el campo de datos a enviar con un dato como error
+      for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+      {
+        mensajeCANTransmitido.data[i] = 0xFF;
+      }
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+  }
+  Serial.println("Recibidos todos los mensajes firmados con SHA-1");
 
   Serial.println("Fin de la ejecución del ESP32 derecho");
 #endif
