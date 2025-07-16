@@ -59,7 +59,7 @@ twai_message_t mensajesCanLeidosAES[MENSAJES_AES];
 #ifdef IZQ                             // Los pines para el transceptor CAN del lado izquierdo
 const gpio_num_t txCtrl = GPIO_NUM_45; // Pin TxCAN del CAN
 const gpio_num_t rxCtrl = GPIO_NUM_48; // Pin RxCAN del CAN
-unsigned long tiempoInicial, tiempoFinal, tiempoTranscurrido[NUM_REP], sumatorio;
+unsigned long tiempoInicial, tiempoFinal, tiempoTranscurrido[NUM_REP + 1], sumatorio;
 double media;
 uint8_t entradaCifradoAES[LONGITUD_MENSAJE_AES];
 #endif
@@ -128,7 +128,7 @@ void loop()
   // Con esto damos tiempo a que se inicie el ESP32 derecho
   delay(1000);
   // Iniciamos la fase de enviar mensajes sin cifrar
-  for (uint8_t k = 0; k < NUM_REP; k++)
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
   {
     // Inicio el contador
     tiempoInicial = micros();
@@ -150,7 +150,7 @@ void loop()
   }
   // Mostramos cuánto se ha tardado en cada iteración y la media
   sumatorio = 0;
-  for (uint8_t i = 0; i < NUM_REP; i++)
+  for (uint8_t i = 1; i <= NUM_REP; i++) // Cogemos todos los valores (NUM_REP+1) menos el primero porque es más lento
   {
     Serial.print(tiempoTranscurrido[i]);
     Serial.print(" ");
@@ -162,8 +162,6 @@ void loop()
   Serial.println(" us");
 
   // Empezamos con el cifrado AES-128
-  // Inicializamos el cifrador AES
-  mbedtls_aes_init(&cifradorAES);
   for (uint8_t k = 0; k < NUM_REP; k++)
   {
     // Inicio el contador
@@ -178,8 +176,10 @@ void loop()
       entradaCifradoAES[i] = 0; // Padding ya que la entrada del cifrador es de 16 bytes
     }
     // Ciframos con AES-128
+    mbedtls_aes_init(&cifradorAES); // Inicializamos el cifrador AES
     mbedtls_aes_setkey_enc(&cifradorAES, claveAES128, LONGITUD_128);
     mbedtls_aes_crypt_ecb(&cifradorAES, MBEDTLS_AES_ENCRYPT, entradaCifradoAES, mensajeCifradoAES);
+    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Rellenamos los dos mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_AES; i++)
     {
@@ -211,12 +211,8 @@ void loop()
   Serial.print("\nLa media del envío de datos cifrados con AES-128 ha sido: ");
   Serial.print(media);
   Serial.println(" us");
-  // Limpiamos el cifrador AES
-  mbedtls_aes_free(&cifradorAES);
 
   // Empezamos con el cifrado AES-256
-  // Inicializamos el cifrador AES
-  mbedtls_aes_init(&cifradorAES);
   for (uint8_t k = 0; k < NUM_REP; k++)
   {
     // Inicio el contador
@@ -231,8 +227,10 @@ void loop()
       entradaCifradoAES[i] = 0; // Padding ya que la entrada del cifrador es de 16 bytes
     }
     // Ciframos con AES-256
+    mbedtls_aes_init(&cifradorAES); // Inicializamos el cifrador AES
     mbedtls_aes_setkey_enc(&cifradorAES, claveAES256, LONGITUD_256);
     mbedtls_aes_crypt_ecb(&cifradorAES, MBEDTLS_AES_ENCRYPT, entradaCifradoAES, mensajeCifradoAES);
+    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Rellenamos los dos mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_AES; i++)
     {
@@ -264,8 +262,6 @@ void loop()
   Serial.print("\nLa media del envío de datos cifrados con AES-256 ha sido: ");
   Serial.print(media);
   Serial.println(" us");
-  // Limpiamos el cifrador AES
-  mbedtls_aes_free(&cifradorAES);
 
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 izquierdo");
@@ -273,7 +269,7 @@ void loop()
 #endif
 #ifdef DER // El código para el ESP32 del lado derecho
   // Iniciamos la fase de recibir mensajes sin cifrar
-  for (uint8_t k = 0; k < NUM_REP; k++)
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
   {
     // Esperamos a que nos llegue el primer mensaje
     while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
@@ -295,8 +291,6 @@ void loop()
   Serial.println("Recibidos todos los mensajes sin cifrar");
 
   // Iniciamos la fase de recibir mensajes cifrados con AES-128
-  // Inicializamos el cifrador AES
-  mbedtls_aes_init(&cifradorAES);
   for (uint8_t k = 0; k < NUM_REP; k++)
   {
     for (uint8_t i = 0; i < MENSAJES_AES; i++)
@@ -315,8 +309,10 @@ void loop()
       }
     }
     // Desciframos los mensajes recibidos
+    mbedtls_aes_init(&cifradorAES); // Inicializamos el cifrador AES
     mbedtls_aes_setkey_dec(&cifradorAES, claveAES128, LONGITUD_128);
     mbedtls_aes_crypt_ecb(&cifradorAES, MBEDTLS_AES_DECRYPT, mensajeCifradoAES, salidaDescifradoAES);
+    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Rellenamos el campo de datos a enviar
     for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
     {
@@ -326,12 +322,8 @@ void loop()
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
   }
   Serial.println("Recibidos todos los mensajes cifrados con AES-128");
-  // Limpiamos el cifrador AES
-  mbedtls_aes_free(&cifradorAES);
 
   // Iniciamos la fase de recibir mensajes cifrados con AES-256
-  // Inicializamos el cifrador AES
-  mbedtls_aes_init(&cifradorAES);
   for (uint8_t k = 0; k < NUM_REP; k++)
   {
     for (uint8_t i = 0; i < MENSAJES_AES; i++)
@@ -350,8 +342,10 @@ void loop()
       }
     }
     // Desciframos los mensajes recibidos
+    mbedtls_aes_init(&cifradorAES); // Inicializamos el cifrador AES
     mbedtls_aes_setkey_dec(&cifradorAES, claveAES256, LONGITUD_256);
     mbedtls_aes_crypt_ecb(&cifradorAES, MBEDTLS_AES_DECRYPT, mensajeCifradoAES, salidaDescifradoAES);
+    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Rellenamos el campo de datos a enviar
     for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
     {
@@ -361,8 +355,6 @@ void loop()
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
   }
   Serial.println("Recibidos todos los mensajes cifrados con AES-256");
-  // Limpiamos el cifrador AES
-  mbedtls_aes_free(&cifradorAES);
 
   Serial.println("Fin de la ejecución del ESP32 derecho");
 #endif
