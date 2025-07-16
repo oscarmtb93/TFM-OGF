@@ -19,10 +19,10 @@ const unsigned long BAUDRATE = 115200;
 const uint8_t LONGITUD_MENSAJE_AES = 16;
 const uint8_t LONGITUD_128 = 128;
 const uint16_t LONGITUD_256 = 256;
-uint8_t claveAES128[LONGITUD_128 / 8] = {
+const uint8_t claveAES128[LONGITUD_128 / 8] = {
     0x87, 0x04, 0x0A, 0x89, 0x59, 0x22, 0xE6, 0x52,
     0x05, 0x6C, 0xE6, 0xB2, 0xCD, 0x3F, 0xB1, 0xA0};
-uint8_t claveAES256[LONGITUD_256 / 8] = {
+const uint8_t claveAES256[LONGITUD_256 / 8] = {
     0x61, 0xB1, 0xC1, 0xEF, 0x69, 0xD1, 0x66, 0x41,
     0xE4, 0x53, 0x5A, 0x03, 0x38, 0x0F, 0x2C, 0x0B,
     0xFA, 0xCC, 0xB6, 0x5D, 0x1F, 0x0D, 0x5E, 0x06,
@@ -59,7 +59,7 @@ twai_message_t mensajesCanLeidosAES[MENSAJES_AES];
 #ifdef IZQ                             // Los pines para el transceptor CAN del lado izquierdo
 const gpio_num_t txCtrl = GPIO_NUM_45; // Pin TxCAN del CAN
 const gpio_num_t rxCtrl = GPIO_NUM_48; // Pin RxCAN del CAN
-unsigned long tiempoInicial, tiempoFinal, tiempoTranscurrido[NUM_REP + 1], sumatorio;
+unsigned long tiempoInicial, tiempoFinal, tiempoTranscurrido[NUM_REP], sumatorio;
 double media;
 uint8_t entradaCifradoAES[LONGITUD_MENSAJE_AES];
 #endif
@@ -146,11 +146,14 @@ void loop()
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
     // Tiempo empleado en el proceso
-    tiempoTranscurrido[k] = tiempoFinal - tiempoInicial;
+    if (k > 0)
+    {
+      tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
+    }
   }
   // Mostramos cuánto se ha tardado en cada iteración y la media
   sumatorio = 0;
-  for (uint8_t i = 1; i <= NUM_REP; i++) // Cogemos todos los valores (NUM_REP+1) menos el primero porque es más lento
+  for (uint8_t i = 0; i < NUM_REP; i++)
   {
     Serial.print(tiempoTranscurrido[i]);
     Serial.print(" ");
@@ -162,7 +165,7 @@ void loop()
   Serial.println(" us");
 
   // Empezamos con el cifrado AES-128
-  for (uint8_t k = 0; k < NUM_REP; k++)
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
   {
     // Inicio el contador
     tiempoInicial = micros();
@@ -197,7 +200,10 @@ void loop()
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
     // Tiempo empleado en el proceso
-    tiempoTranscurrido[k] = tiempoFinal - tiempoInicial;
+    if (k > 0)
+    {
+      tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
+    }
   }
   // Mostramos cuánto se ha tardado en cada iteración y la media
   sumatorio = 0;
@@ -213,7 +219,7 @@ void loop()
   Serial.println(" us");
 
   // Empezamos con el cifrado AES-256
-  for (uint8_t k = 0; k < NUM_REP; k++)
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
   {
     // Inicio el contador
     tiempoInicial = micros();
@@ -248,7 +254,10 @@ void loop()
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
     // Tiempo empleado en el proceso
-    tiempoTranscurrido[k] = tiempoFinal - tiempoInicial;
+    if (k > 0)
+    {
+      tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
+    }
   }
   // Mostramos cuánto se ha tardado en cada iteración y la media
   sumatorio = 0;
@@ -291,7 +300,7 @@ void loop()
   Serial.println("Recibidos todos los mensajes sin cifrar");
 
   // Iniciamos la fase de recibir mensajes cifrados con AES-128
-  for (uint8_t k = 0; k < NUM_REP; k++)
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
   {
     for (uint8_t i = 0; i < MENSAJES_AES; i++)
     {
@@ -324,7 +333,7 @@ void loop()
   Serial.println("Recibidos todos los mensajes cifrados con AES-128");
 
   // Iniciamos la fase de recibir mensajes cifrados con AES-256
-  for (uint8_t k = 0; k < NUM_REP; k++)
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
   {
     for (uint8_t i = 0; i < MENSAJES_AES; i++)
     {
