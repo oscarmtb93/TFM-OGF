@@ -14,6 +14,7 @@ v1.0 - ESP32-S3
 #include "driver/twai.h"
 // Librerías para utilizar el cifrado y firma integrados en el ESP32
 #include <mbedtls/aes.h>
+#include <mbedtls/md5.h>
 #include <mbedtls/sha1.h>
 
 const unsigned long BAUDRATE = 115200;
@@ -32,7 +33,11 @@ const uint8_t claveAES256[LONGITUD_256 / 8] = {
     0xFA, 0xCC, 0xB6, 0x5D, 0x1F, 0x0D, 0x5E, 0x06,
     0x8D, 0x56, 0x71, 0xE9, 0xB9, 0xEE, 0xD6, 0x25};
 
-// Constantes para la firma SHA
+// Constantes para el hash MD5
+const uint8_t LONGITUD_MD5 = 16;
+const uint8_t MENSAJES_MD5 = 2;
+
+// Constantes para el hash SHA-1
 const uint8_t LONGITUD_SHA1 = 20;
 const uint8_t MENSAJES_SHA1 = 3;
 
@@ -62,6 +67,10 @@ const uint8_t NUM_REP = 100;
 mbedtls_aes_context cifradorAES;
 uint8_t mensajeCifradoAES[LONGITUD_MENSAJE_AES];
 
+// Variables para el hash MD5
+mbedtls_md5_context contextoMD5;
+uint8_t md5Generado[LONGITUD_MD5];
+
 // Variables para el hash SHA-1
 mbedtls_sha1_context contextoSHA1;
 uint8_t sha1Generado[LONGITUD_SHA1];
@@ -79,6 +88,8 @@ const gpio_num_t rxCtrl = GPIO_NUM_9;  // Pin RxCAN del CAN
 uint8_t datosRecibidos[LONGITUD_MENSAJE_CAN];
 twai_message_t mensajesCanLeidosAES[MENSAJES_AES];
 uint8_t salidaDescifradoAES[LONGITUD_MENSAJE_AES];
+twai_message_t mensajesCanLeidosMD5[MENSAJES_MD5];
+uint8_t md5Recibido[LONGITUD_MD5];
 twai_message_t mensajesCanLeidosSHA1[MENSAJES_SHA1];
 uint8_t sha1Recibido[LONGITUD_SHA1];
 #endif
@@ -276,7 +287,67 @@ void loop()
   media = (double)sumatorio / NUM_REP;
   Serial.printf("\nLa media del envío de datos cifrados con AES-256 ha sido: %f us\n", media);
 
-  // Empezamos con la firma SHA-1
+  // Empezamos con el hash MD5
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    // Inicio el contador
+    tiempoInicial = micros();
+    // Rellenamos el campo de datos a enviar para que luego el receptor tenga la referencia
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      mensajeCANTransmitido.data[i] = i;
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    // Realizamos el hash con MD5
+    mbedtls_md5_init(&contextoMD5); // Inicializamos el contexto MD5
+    mbedtls_md5_starts_ret(&contextoMD5);
+    mbedtls_md5_update_ret(&contextoMD5, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se puede hacer con strlen((char*)entradaMD5)
+    mbedtls_md5_finish_ret(&contextoMD5, md5Generado);
+    mbedtls_md5_free(&contextoMD5); // Limpiamos el contexto MD5
+    // Rellenamos los dos mensajes a enviar
+    for (uint8_t i = 0; i < MENSAJES_MD5; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        mensajeCANTransmitido.data[j] = md5Generado[j + i * LONGITUD_MENSAJE_CAN];
+      }
+      // Enviar el mensaje CAN
+      twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    }
+    // Esperamos a que nos llegue el mensaje de vuelta
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Momento que finalizamos la cuenta
+    tiempoFinal = micros();
+    // Tiempo empleado en el proceso
+    if (k > 0)
+    {
+      tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
+    }
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien el hash
+    if (mensajeCANLeido.data[0] == 0x00)
+    {
+      Serial.printf("En la iteración %d el hash MD5 ha ido BIEN\n", k);
+    }
+    else
+    {
+      Serial.printf("En la iteración %d el hash MD5 ha ido MAL\n", k);
+    }
+    */
+  }
+  // Mostramos cuánto se ha tardado en cada iteración y la media
+  sumatorio = 0;
+  for (uint8_t i = 0; i < NUM_REP; i++)
+  {
+    Serial.printf("%d ", tiempoTranscurrido[i]);
+    sumatorio += tiempoTranscurrido[i];
+  }
+  media = (double)sumatorio / NUM_REP;
+  Serial.printf("\nLa media del envío de datos hasheados con MD5 ha sido: %f us\n", media);
+
+  // Empezamos con el hash SHA-1
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
   {
     // Inicio el contador
@@ -322,14 +393,14 @@ void loop()
     {
       tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
     }
-    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien la firma
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien el hash
     if (mensajeCANLeido.data[0] == 0x00)
     {
-      Serial.printf("En la iteración %d la firma SHA1 ha ido BIEN\n", k);
+      Serial.printf("En la iteración %d el hash SHA1 ha ido BIEN\n", k);
     }
     else
     {
-      Serial.printf("En la iteración %d la firma SHA1 ha ido MAL\n", k);
+      Serial.printf("En la iteración %d el hash SHA1 ha ido MAL\n", k);
     }
     */
   }
@@ -341,7 +412,7 @@ void loop()
     sumatorio += tiempoTranscurrido[i];
   }
   media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos firmados con SHA-1 ha sido: %f us\n", media);
+  Serial.printf("\nLa media del envío de datos hasheados con SHA-1 ha sido: %f us\n", media);
 
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 izquierdo");
@@ -436,6 +507,78 @@ void loop()
   }
   Serial.println("Recibidos todos los mensajes cifrados con AES-256");
 
+  // Iniciamos la fase de recibir mensajes firmados con MD5
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    // Esperamos a que nos llegue el primer mensaje
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Leemos el campo de datos recibido
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      datosRecibidos[i] = mensajeCANLeido.data[i];
+    }
+    for (uint8_t i = 0; i < MENSAJES_MD5; i++)
+    {
+      // Esperamos a que nos llegue los mensajes con el hash
+      while (twai_receive(&mensajesCanLeidosMD5[i], pdMS_TO_TICKS(0)) != ESP_OK)
+      {
+      }
+    }
+    // Leemos el campo de datos recibido con el hash
+    for (uint8_t i = 0; i < MENSAJES_MD5; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        md5Recibido[j + i * LONGITUD_MENSAJE_CAN] = mensajesCanLeidosMD5[i].data[j];
+      }
+    }
+    // Realizamos el hash del mensaje recibido inicialmente
+    mbedtls_md5_init(&contextoMD5); // Inicializamos el contexto MD5
+    mbedtls_md5_starts_ret(&contextoMD5);
+    mbedtls_md5_update_ret(&contextoMD5, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se puede hacer con strlen((char*)entradaMD5)
+    mbedtls_md5_finish_ret(&contextoMD5, md5Generado);
+    mbedtls_md5_free(&contextoMD5); // Limpiamos el contexto MD5
+    /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
+    if (k == 50)
+    {
+      Serial.print("md5Generado: ");
+      for (uint8_t i = 0; i < LONGITUD_MD5; i++)
+      {
+        Serial.printf("%x ", md5Generado[i]);
+      }
+      Serial.println();
+      Serial.print("md5Recibido: ");
+      for (uint8_t i = 0; i < LONGITUD_MD5; i++)
+      {
+        Serial.printf("%x ", md5Recibido[i]);
+      }
+      Serial.println();
+    }
+    */
+    // Ahora comparamos el hash calculado con el hash recibido
+    if (memcmp(md5Recibido, md5Generado, LONGITUD_MD5) == 0)
+    {
+      // Rellenamos el campo de datos a enviar con los datos originales
+      for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+      {
+        mensajeCANTransmitido.data[i] = datosRecibidos[i];
+      }
+    }
+    else
+    {
+      // Rellenamos el campo de datos a enviar con un dato como error
+      for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+      {
+        mensajeCANTransmitido.data[i] = 0xFF;
+      }
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+  }
+  Serial.println("Recibidos todos los mensajes firmados con MD5");
+
   // Iniciamos la fase de recibir mensajes firmados con SHA1
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
   {
@@ -450,12 +593,12 @@ void loop()
     }
     for (uint8_t i = 0; i < MENSAJES_SHA1; i++)
     {
-      // Esperamos a que nos llegue los mensajes con la firma
+      // Esperamos a que nos llegue los mensajes con el hash
       while (twai_receive(&mensajesCanLeidosSHA1[i], pdMS_TO_TICKS(0)) != ESP_OK)
       {
       }
     }
-    // Leemos el campo de datos recibido con la firma
+    // Leemos el campo de datos recibido con el hash
     for (uint8_t i = 0; i < MENSAJES_SHA1 - 1; i++)
     {
       for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
@@ -474,8 +617,8 @@ void loop()
     mbedtls_sha1_update_ret(&contextoSHA1, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se puede hacer con strlen((char*)entradaSHA1)
     mbedtls_sha1_finish_ret(&contextoSHA1, sha1Generado);
     mbedtls_sha1_free(&contextoSHA1); // Limpiamos el contexto SHA-1
-    /* Estas líneas comentadas fueron de debug para comprobar la firma recibida y generada
-    if (k == 0)
+    /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
+    if (k == 50)
     {
       Serial.print("sha1Generado: ");
       for (uint8_t i = 0; i < LONGITUD_SHA1; i++)
@@ -491,7 +634,7 @@ void loop()
       Serial.println();
     }
     */
-    // Ahora comparamos la firma calculada con la firma recibida
+    // Ahora comparamos el hash calculado con el hash recibido
     if (memcmp(sha1Recibido, sha1Generado, LONGITUD_SHA1) == 0)
     {
       // Rellenamos el campo de datos a enviar con los datos originales
