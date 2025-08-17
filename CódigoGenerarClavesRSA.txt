@@ -1,9 +1,7 @@
 #include <Arduino.h>
 #include "mbedtls/pk.h"
-#include "mbedtls/rsa.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
-#include "mbedtls/pem.h"
 
 // Selecciona tamaño: 2048, 3072 o 4096 bits
 const int tamanoClave = 2048;
