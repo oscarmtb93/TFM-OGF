@@ -55,6 +55,10 @@ const uint8_t MENSAJES_SHA256 = 4;
 const uint8_t LONGITUD_SHA384 = 48;
 const uint8_t MENSAJES_SHA384 = 6;
 
+// Constantes para el hash SHA-512
+const uint8_t LONGITUD_SHA512 = 64;
+const uint8_t MENSAJES_SHA512 = 8;
+
 // Variables mensajes CAN
 const twai_timing_config_t BITRATE_CAN = TWAI_TIMING_CONFIG_500KBITS(); // Bitrate de la línea CAN
 const bool CAN_EXTENDIDO = false;                                       // Si es true, es CAN extendido; si es false, es estándar
@@ -101,6 +105,10 @@ uint8_t sha256Generado[LONGITUD_SHA256];
 mbedtls_sha512_context contextoSHA384;
 uint8_t sha384Generado[LONGITUD_SHA384];
 
+// Variables para el hash SHA-512
+mbedtls_sha512_context contextoSHA512;
+uint8_t sha512Generado[LONGITUD_SHA512];
+
 // A continuación, variables que sólo aplican en el ESP32 izquierdo
 #ifdef IZQ
 // Los pines para el transceptor CAN del lado izquierdo
@@ -129,6 +137,8 @@ twai_message_t mensajesCanLeidosSHA256[MENSAJES_SHA256];
 uint8_t sha256Recibido[LONGITUD_SHA256];
 twai_message_t mensajesCanLeidosSHA384[MENSAJES_SHA384];
 uint8_t sha384Recibido[LONGITUD_SHA384];
+twai_message_t mensajesCanLeidosSHA512[MENSAJES_SHA512];
+uint8_t sha512Recibido[LONGITUD_SHA512];
 #endif
 
 void setup()
@@ -638,6 +648,66 @@ void loop()
   media = (double)sumatorio / NUM_REP;
   Serial.printf("\nLa media del envío de datos hasheados con SHA-384 ha sido: %f us\n", media);
 
+  // Empezamos con el hash SHA-512
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    // Inicio el contador
+    tiempoInicial = micros();
+    // Rellenamos el campo de datos a enviar para que luego el receptor tenga la referencia
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      mensajeCANTransmitido.data[i] = i;
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    // Realizamos el hash con SHA-512
+    mbedtls_sha512_init(&contextoSHA512); // Inicializamos el contexto SHA-512
+    mbedtls_sha512_starts_ret(&contextoSHA512, 0);
+    mbedtls_sha512_update_ret(&contextoSHA512, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
+    mbedtls_sha512_finish_ret(&contextoSHA512, sha512Generado);
+    mbedtls_sha512_free(&contextoSHA512); // Limpiamos el contexto SHA-512
+    // Rellenamos los mensajes a enviar
+    for (uint8_t i = 0; i < MENSAJES_SHA512; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        mensajeCANTransmitido.data[j] = sha512Generado[j + i * LONGITUD_MENSAJE_CAN];
+      }
+      // Enviar el mensaje CAN
+      twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    }
+    // Esperamos a que nos llegue el mensaje de vuelta
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Momento que finalizamos la cuenta
+    tiempoFinal = micros();
+    // Tiempo empleado en el proceso
+    if (k > 0)
+    {
+      tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
+    }
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien el hash
+    if (mensajeCANLeido.data[0] == 0x00)
+    {
+      Serial.printf("En la iteración %d el hash SHA-512 ha ido BIEN\n", k);
+    }
+    else
+    {
+      Serial.printf("En la iteración %d el hash SHA-512 ha ido MAL\n", k);
+    }
+    */
+  }
+  // Mostramos cuánto se ha tardado en cada iteración y la media
+  sumatorio = 0;
+  for (uint8_t i = 0; i < NUM_REP; i++)
+  {
+    Serial.printf("%d ", tiempoTranscurrido[i]);
+    sumatorio += tiempoTranscurrido[i];
+  }
+  media = (double)sumatorio / NUM_REP;
+  Serial.printf("\nLa media del envío de datos hasheados con SHA-512 ha sido: %f us\n", media);
+
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 izquierdo");
   esp_deep_sleep_start();
@@ -1101,6 +1171,80 @@ void loop()
   }
   Serial.println("Recibidos todos los mensajes firmados con SHA-384");
 
+  // Iniciamos la fase de recibir mensajes firmados con SHA-512
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    // Esperamos a que nos llegue el primer mensaje
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Leemos el campo de datos recibido
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      datosRecibidos[i] = mensajeCANLeido.data[i];
+    }
+    for (uint8_t i = 0; i < MENSAJES_SHA512; i++)
+    {
+      // Esperamos a que nos llegue los mensajes con el hash
+      while (twai_receive(&mensajesCanLeidosSHA512[i], pdMS_TO_TICKS(0)) != ESP_OK)
+      {
+      }
+    }
+    // Leemos el campo de datos recibido con el hash
+    for (uint8_t i = 0; i < MENSAJES_SHA512; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        sha512Recibido[j + i * LONGITUD_MENSAJE_CAN] = mensajesCanLeidosSHA512[i].data[j];
+      }
+    }
+    // Realizamos el hash del mensaje recibido inicialmente
+    mbedtls_sha512_init(&contextoSHA512); // Inicializamos el contexto SHA-512
+    mbedtls_sha512_starts_ret(&contextoSHA512, 0);
+    mbedtls_sha512_update_ret(&contextoSHA512, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
+    mbedtls_sha512_finish_ret(&contextoSHA512, sha512Generado);
+    mbedtls_sha512_free(&contextoSHA512); // Limpiamos el contexto SHA-512
+    /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
+    if (k == 50)
+    {
+      Serial.print("sha512Generado: ");
+      for (uint8_t i = 0; i < LONGITUD_SHA512; i++)
+      {
+        Serial.printf("%x ", sha512Generado[i]);
+      }
+      Serial.println();
+      Serial.print("sha512Recibido: ");
+      for (uint8_t i = 0; i < LONGITUD_SHA512; i++)
+      {
+        Serial.printf("%x ", sha512Recibido[i]);
+      }
+      Serial.println();
+    }
+    */
+    // Ahora comparamos el hash calculado con el hash recibido
+    if (memcmp(sha512Recibido, sha512Generado, LONGITUD_SHA512) == 0)
+    {
+      // Rellenamos el campo de datos a enviar con los datos originales
+      for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+      {
+        mensajeCANTransmitido.data[i] = datosRecibidos[i];
+      }
+    }
+    else
+    {
+      // Rellenamos el campo de datos a enviar con un dato como error
+      for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+      {
+        mensajeCANTransmitido.data[i] = 0xFF;
+      }
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+  }
+  Serial.println("Recibidos todos los mensajes firmados con SHA-512");
+
+  // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 derecho");
+  esp_deep_sleep_start();
 #endif
 }
