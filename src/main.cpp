@@ -70,6 +70,10 @@ const uint8_t MENSAJES_RSA2048 = 32;
 const uint16_t LONGITUD_RSA3072 = 384;
 const uint8_t MENSAJES_RSA3072 = 48;
 
+// Constantes para el hash RSA-4096
+const uint16_t LONGITUD_RSA4096 = 512;
+const uint8_t MENSAJES_RSA4096 = 64;
+
 // Variables mensajes CAN
 const twai_timing_config_t BITRATE_CAN = TWAI_TIMING_CONFIG_500KBITS(); // Bitrate de la línea CAN
 const bool CAN_EXTENDIDO = false;                                       // Si es true, es CAN extendido; si es false, es estándar
@@ -130,6 +134,11 @@ mbedtls_pk_context contextoClaveRSA3072;
 mbedtls_rsa_context *contextoRSA3072;
 uint8_t mensajeCifradoRSA3072[LONGITUD_RSA3072];
 
+// Variables para el cifrado RSA-4096
+mbedtls_pk_context contextoClaveRSA4096;
+mbedtls_rsa_context *contextoRSA4096;
+uint8_t mensajeCifradoRSA4096[LONGITUD_RSA4096];
+
 // A continuación, variables que sólo aplican en el ESP32 izquierdo
 #ifdef IZQ
 // Los pines para el transceptor CAN del lado izquierdo
@@ -168,11 +177,11 @@ cKwapILZWUiA+EQSUhQ5PQKBgBRs603P3nSpKNCz7n3XZmkfBX2YNEaEZlCG3UEz
 upKlaivW/HYpYMhDU1AYi0BDvb+UkKNGM44q3nCzKyaSDVAQN0apSoVhnhOoKCfZ
 lgRO3O1V3YrjI9kPn0sVJ4Stv2tMTTiW7spdVOSgyw4w/RP0L30N
 -----END RSA PRIVATE KEY-----)";
+
 uint8_t entradaCifradoRSA3072[LONGITUD_RSA3072];
 // Clave privada RSA-3072
 static const char CLAVE_PRIVADA_RSA3072[] PROGMEM =
-    R"(===== CLAVE PRIVADA (PEM) =====
------BEGIN RSA PRIVATE KEY-----
+    R"(-----BEGIN RSA PRIVATE KEY-----
 MIIG5AIBAAKCAYEAtGHPdL5TmobWFAPCiyTH+OETkfMTooCESuZfqMTf4SS/bdb9
 CjjRn8HUwXoOL91XLzG/ZOQTtqF/ff0D8SRBG1e+dqThjlgKB8vNFm/I0uNMKoyx
 9l8H291+ixfFv7G6rJnDaPvpcUNXybWWyve2hqO7rg/iTtGmaNNNGJJwOaqcoaFf
@@ -212,6 +221,61 @@ G7xsYAsbZgqNP3x3VjcJcKNPXxNJfWkIoafyHCiVlEaeJS2WcRxjTD+k3EXuoNYA
 pNpbS7T7iaYQVW1HJxx4VDUFRz23+ZjNUnbY22ogIojD//87rQTXtA==
 -----END RSA PRIVATE KEY-----)";
 
+uint8_t entradaCifradoRSA4096[LONGITUD_RSA4096];
+// Clave privada RSA-4096
+static const char CLAVE_PRIVADA_RSA4096[] PROGMEM =
+    R"(-----BEGIN RSA PRIVATE KEY-----
+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
+-----END RSA PRIVATE KEY-----)";
+
 #endif
 
 // A continuación, variables que sólo aplican en el ESP32 derecho
@@ -247,6 +311,7 @@ lV5UjnTtg4pSdWWLw7vjEChSXKWd87oYJyJJOFr+67vh0NgrRDhOERgDKE1e3eGh
 PrvGCl+92bZMVmS1IYnz7CFpvnZ2Z5rbsY5IYJHUuRmKtU+Zsgf6gQCoGHm9/60m
 SwIDAQAB
 -----END PUBLIC KEY-----)";
+
 twai_message_t mensajesCanLeidosRSA3072[MENSAJES_RSA3072];
 uint8_t salidaDescifradoRSA3072[LONGITUD_RSA3072];
 // Clave pública RSA-3072
@@ -261,6 +326,25 @@ s1x1M7AYSexrGa2RqU/4n7V6ylHeAQH0h/BgHkRx6ABRZsZzil1QMiIxd/RxzwWU
 uq8WgKybBZ/VWYSiWKndJYZN29HulkouzRLt79J6NC4FVR0JLh9ABjnTNekFDNgm
 TD6hu9jo2UWjQ0gKiUf7uErKbzxsdQAta0fuhUDb17OI3qic9X4ZxqbD6/4IJnf/
 OU87NRFtw3VjA21wZnpnzL6EXUzzHzHgS49shS98wYIPAgMBAAE=
+-----END PUBLIC KEY-----)";
+
+twai_message_t mensajesCanLeidosRSA4096[MENSAJES_RSA4096];
+uint8_t salidaDescifradoRSA4096[LONGITUD_RSA4096];
+// Clave pública RSA-4096
+static const char CLAVE_PUBLICA_RSA4096[] PROGMEM =
+    R"(-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAr9b8C+0vB/EEHvrU7qgZ
+yXmbosrIW7SK/R9UkMlmsLqVgI8dK2fvkO4dmWvp/tK8yZyfAoa6Ew6qrqJAA35x
+dYvPgOC2EthRqcaKAZPxe0KhdKG8YrqxGX3JfL7br+FGOp7eGRmyNCOtSIoGXCQH
+R+U7EdDzpbDGXJYdaQrqjbtM5IvqNPNEo9ds7a2PjvMHF3B4GPsGQEQh2i4NqARY
+IWLpB/rXt2NQoI0ECQ6/IDswmizcxenzMRNMIX3jT3QM+ikes/OccuG74nh72Kso
+qxw5WKFTk0ciDY9siG+9xmhetPItOAwR+C4j2pxlOnsncxkWDtyrRXxpl27/gqL9
+X40RUv3fQopb2WNMnNFJoWYmRYZh1p0e8hDX6Eu3S4PnQy9h6X1CoFhZQHTPUhkS
+RR3UVu0vryJb31hYSA9L4RSOJQDrUu8X+kWkOWhaf+eCQyWNRvP5qBg7rkTK4JHf
+2JFELtYQvop6lx/SJrN6ZAEVmTLrWz+wWQOwwzC8p/T/9YwIx7OWByyiGQD6HAEr
+f4hIMwMpZ/LImBeRYqxWjTO5EIwVOo242UBkGEPIm6Gbz69wu/ONwp4owxUPAV8I
+i3tcK5wRRyAtwNSiJPMxbzScY0rNu/QIHZN7xYPAD+7dmnN4yDrX6x0gJFk0Mn7Y
+9ky3d+FLms4d3Yd1BBjE3HUCAwEAAQ==
 -----END PUBLIC KEY-----)";
 #endif
 
@@ -953,6 +1037,67 @@ void loop()
   media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
   Serial.printf("\nLa media del envío de datos hasheados con RSA-3072 ha sido: %f ms\n", media);
 
+  // Empezamos con el cifrado RSA-4096
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    // Inicio el contador
+    tiempoInicial = micros();
+    // Rellenamos el dato a ser cifrado con RSA-4096
+    memset(entradaCifradoRSA4096, 0, sizeof(LONGITUD_RSA4096)); // Padding ya que la entrada del cifrador es de 512 bytes
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      entradaCifradoRSA4096[i] = i;
+    }
+    // Realizamos el cifrado con RSA-4096
+    mbedtls_pk_init(&contextoClaveRSA4096);                                                                                                // Inicializamos el contexto RSA-4096
+    mbedtls_pk_parse_key(&contextoClaveRSA4096, (const unsigned char *)CLAVE_PRIVADA_RSA4096, strlen(CLAVE_PRIVADA_RSA4096) + 1, NULL, 0); // Parsear claves
+    contextoRSA4096 = mbedtls_pk_rsa(contextoClaveRSA4096);
+    mbedtls_rsa_private(contextoRSA4096, NULL, NULL, entradaCifradoRSA4096, mensajeCifradoRSA4096);
+    // Rellenamos los mensajes a enviar
+    for (uint8_t i = 0; i < MENSAJES_RSA4096; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        mensajeCANTransmitido.data[j] = mensajeCifradoRSA4096[j + i * LONGITUD_MENSAJE_CAN];
+      }
+      // Enviar el mensaje CAN
+      twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    }
+    // Esperamos a que nos llegue el mensaje de vuelta
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Momento que finalizamos la cuenta
+    tiempoFinal = micros();
+    mbedtls_pk_free(&contextoClaveRSA4096); // Limpiamos el contexto de la clave RSA-4096
+    mbedtls_rsa_free(contextoRSA4096);      // Limpiamos el contexto RSA-4096
+    // Tiempo empleado en el proceso
+    if (k > 0)
+    {
+      tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
+    }
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien el hash
+    uint8_t original[TWAI_FRAME_MAX_DLC] = {0, 1, 2, 3, 4, 5, 6, 7};
+    if (memcmp(mensajeCANLeido.data, original, LONGITUD_MENSAJE_CAN) == 0)
+    {
+      Serial.printf("En la iteración %d el cifrado RSA-4096 ha ido BIEN\n", k);
+    }
+    else
+    {
+      Serial.printf("En la iteración %d el cifrado RSA-4096 ha ido MAL\n", k);
+    }
+    */
+  }
+  // Mostramos cuánto se ha tardado en cada iteración y la media
+  sumatorio = 0;
+  for (uint8_t i = 0; i < NUM_REP; i++)
+  {
+    Serial.printf("%d ", tiempoTranscurrido[i]);
+    sumatorio += tiempoTranscurrido[i];
+  }
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos hasheados con RSA-4096 ha sido: %f ms\n", media);
+
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 izquierdo");
   esp_deep_sleep_start();
@@ -1557,6 +1702,41 @@ void loop()
     mbedtls_rsa_free(contextoRSA3072);      // Limpiamos el contexto RSA-3072
   }
   Serial.println("Recibidos todos los mensajes cifrados con RSA-3072");
+
+  // Iniciamos la fase de recibir mensajes cifrados con RSA-4096
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    for (uint8_t i = 0; i < MENSAJES_RSA4096; i++)
+    {
+      // Esperamos a que nos llegue los mensajes cifrados
+      while (twai_receive(&mensajesCanLeidosRSA4096[i], pdMS_TO_TICKS(0)) != ESP_OK)
+      {
+      }
+    }
+    // Leemos el campo de datos recibido
+    for (uint8_t i = 0; i < MENSAJES_RSA4096; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        mensajeCifradoRSA4096[j + i * LONGITUD_MENSAJE_CAN] = mensajesCanLeidosRSA4096[i].data[j];
+      }
+    }
+    // Desciframos los mensajes recibidos
+    mbedtls_pk_init(&contextoClaveRSA4096);                                                                                              // Inicializamos el contexto RSA-4096
+    mbedtls_pk_parse_public_key(&contextoClaveRSA4096, (const unsigned char *)CLAVE_PUBLICA_RSA4096, strlen(CLAVE_PUBLICA_RSA4096) + 1); // Parsear claves
+    contextoRSA4096 = mbedtls_pk_rsa(contextoClaveRSA4096);
+    mbedtls_rsa_public(contextoRSA4096, mensajeCifradoRSA4096, salidaDescifradoRSA4096);
+    // Rellenamos el campo de datos a enviar
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      mensajeCANTransmitido.data[i] = salidaDescifradoRSA4096[i];
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_pk_free(&contextoClaveRSA4096); // Limpiamos el contexto de la clave RSA-4096
+    mbedtls_rsa_free(contextoRSA4096);      // Limpiamos el contexto RSA-4096
+  }
+  Serial.println("Recibidos todos los mensajes cifrados con RSA-4096");
 
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 derecho");
