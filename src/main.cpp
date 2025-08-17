@@ -285,8 +285,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos sin cifrar ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos sin cifrar ha sido: %f ms\n", media);
 
   // Empezamos con el cifrado AES-128
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -336,8 +336,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos cifrados con AES-128 ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos cifrados con AES-128 ha sido: %f ms\n", media);
 
   // Empezamos con el cifrado AES-256
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -387,8 +387,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos cifrados con AES-256 ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos cifrados con AES-256 ha sido: %f ms\n", media);
 
   // Empezamos con el hash MD5
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -447,8 +447,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos hasheados con MD5 ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos hasheados con MD5 ha sido: %f ms\n", media);
 
   // Empezamos con el hash SHA-1
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -514,8 +514,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos hasheados con SHA-1 ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos hasheados con SHA-1 ha sido: %f ms\n", media);
 
   // Empezamos con el hash SHA-224
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -581,8 +581,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos hasheados con SHA-224 ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos hasheados con SHA-224 ha sido: %f ms\n", media);
 
   // Empezamos con el hash SHA-256
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -641,8 +641,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos hasheados con SHA-256 ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos hasheados con SHA-256 ha sido: %f ms\n", media);
 
   // Empezamos con el hash SHA-384
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -701,8 +701,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos hasheados con SHA-384 ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos hasheados con SHA-384 ha sido: %f ms\n", media);
 
   // Empezamos con el hash SHA-512
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -761,8 +761,8 @@ void loop()
     Serial.printf("%d ", tiempoTranscurrido[i]);
     sumatorio += tiempoTranscurrido[i];
   }
-  media = (double)sumatorio / NUM_REP;
-  Serial.printf("\nLa media del envío de datos hasheados con SHA-512 ha sido: %f us\n", media);
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos hasheados con SHA-512 ha sido: %f ms\n", media);
 
   // Empezamos con el cifrado RSA-2048
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
