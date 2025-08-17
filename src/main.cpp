@@ -11,13 +11,16 @@ v1.0 - ESP32-S3
 // #define DER // Si está definido, el código serña el ESP32 del lado derecho
 
 // Librería para utilizar el controlador CAN del ESP32
-#include "driver/twai.h"
+#include <driver/twai.h>
 // Librerías para utilizar el cifrado y firma integrados en el ESP32
 #include <mbedtls/aes.h>
 #include <mbedtls/md5.h>
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h> //Esta librería incluye SHA-224 y SHA-256
 #include <mbedtls/sha512.h> //Esta librería incluye SHA-384 y SHA-512
+// Librerías para RSA
+#include <mbedtls/pk.h>
+#include <mbedtls/rsa.h>
 
 const unsigned long BAUDRATE = 115200;
 
@@ -58,6 +61,10 @@ const uint8_t MENSAJES_SHA384 = 6;
 // Constantes para el hash SHA-512
 const uint8_t LONGITUD_SHA512 = 64;
 const uint8_t MENSAJES_SHA512 = 8;
+
+// Constantes para el hash RSA-2048
+const uint16_t LONGITUD_RSA2048 = 256;
+const uint8_t MENSAJES_RSA2048 = 32;
 
 // Variables mensajes CAN
 const twai_timing_config_t BITRATE_CAN = TWAI_TIMING_CONFIG_500KBITS(); // Bitrate de la línea CAN
@@ -109,6 +116,11 @@ uint8_t sha384Generado[LONGITUD_SHA384];
 mbedtls_sha512_context contextoSHA512;
 uint8_t sha512Generado[LONGITUD_SHA512];
 
+// Variables para el cifrado RSA-2048
+mbedtls_pk_context contextoClaveRSA2048;
+mbedtls_rsa_context *contextoRSA2048;
+uint8_t mensajeCifradoRSA2048[LONGITUD_RSA2048];
+
 // A continuación, variables que sólo aplican en el ESP32 izquierdo
 #ifdef IZQ
 // Los pines para el transceptor CAN del lado izquierdo
@@ -117,6 +129,37 @@ const gpio_num_t rxCtrl = GPIO_NUM_48; // Pin RxCAN del CAN
 unsigned long tiempoInicial, tiempoFinal, tiempoTranscurrido[NUM_REP], sumatorio;
 double media;
 uint8_t entradaCifradoAES[LONGITUD_MENSAJE_AES];
+uint8_t entradaCifradoRSA2048[LONGITUD_RSA2048];
+// Clave privada RSA-2048
+static const char CLAVE_PRIVADA_RSA2048[] PROGMEM =
+    R"(-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAvkyB7cLjZ3Gjzc/rVSCgSkQZFGv1KGl/KsbaMLYNzXUbFa+f
+BhGZG+x9+uhrjPN+YAFm4/9NTDsQrnL1KEaxYyS58S4LzghjTU6iQ3bNU6rSucog
+xbDjH+K9YvHyApvkaIRqGNxzHQzlukREKb2/lV5UjnTtg4pSdWWLw7vjEChSXKWd
+87oYJyJJOFr+67vh0NgrRDhOERgDKE1e3eGh+G4Fq7enLowiFmkQI5T2GF8CRVMe
+Qb5hJe3Cd+e3Rp6LUwFq+8WjMKPZrYSkQxd4PrvGCl+92bZMVmS1IYnz7CFpvnZ2
+Z5rbsY5IYJHUuRmKtU+Zsgf6gQCoGHm9/60mSwIDAQABAoIBACzv/C6dOv4Og9Py
+KWxsy+09r353D+l/IByF4LhoBVJjOQYh9reEKFfDvOwnPl6GkW0yZ42nmCVMPWA0
+nVfpebIj1hTx/q+ko256By9POqVrTV+6L4r/fmLlNDvNToz3KzTTMAq25CgUB5u4
+yy/gMwGeyPDrA7twSpCWbi7Gi5QgyMt99uyTMixfzB07BCRjMqn1Ok1VVmNn5QYG
+M76VIrPIGCQzHoAZvQZSrbcdwQ1R+z4Z77/a3b2MpRDmaqMR9uPcwszI1ipa46+j
+Axkb3lUjyOmr8NaH70rZqY4gXeWgOIfJ8EEX81h+iy7HzAyrPqhOwJrurKi3GLj+
+ML3O9KECgYEA8SPP1Xnd9cJnrmXy8v1s3ee/V8qirPImXc/msUP05sj75mXB9hTT
+876x24IFFa6pnft5jxFMfd5z+1s2O6JzmCqa+zyBTFthtUmxiIiy2Av4W6eW1izb
+qFcayMEzzejd8vMqDyiUgABCLiLp+0NzDd+nHIur/sMFek81t5GS9W0CgYEAygai
+h6gTVps3yNtrZf523Q0o5n0Y6MR0ty28d6mGjFLuYo9q1C6O380qu4QPcZk7gL0o
+y/eQbjkT+D+jVLXj/IX3TFJ+lV/LZ6PUYuv4HwYQzAYz/N+5QyYc7FBK1WNvbe13
+R16mNdZzrPoupqK4wsfOUj7rTsqwc9sENiLxD5cCgYB5neMrOmxsj2C1P2u5i4EF
+peUGBQfoi7Q36iviSXDRmJobCEU7tCN1sj6Hg9rGpbGcIQGc20+lx7TdF5KRnwwH
+ua0yesCHXys3QHSOdMsmVVsr9qkHWdZq34t9pptXBVQzPNqAjKngqMC3/hneBJWZ
+cKwapILZWUiA+EQSUhQ5PQKBgBRs603P3nSpKNCz7n3XZmkfBX2YNEaEZlCG3UEz
+8JiLYfKxEVn2gxd5hNKEnZMcrPltJozIsN+UAcLdnEPaR/ymBsS+qnGrx8Lou3Zs
+6R8p29Tk46izbeWuGsqBq687aG6yzZZ3qVJUJknc2Y6bcRawYNnL5rqGn6R3Bkv6
+6GhtAoGBAMjRhZojRb9+w/tn9/qwOnkjVRCsV40K8RUYMFGbkyHQOrWn7o694VP8
+upKlaivW/HYpYMhDU1AYi0BDvb+UkKNGM44q3nCzKyaSDVAQN0apSoVhnhOoKCfZ
+lgRO3O1V3YrjI9kPn0sVJ4Stv2tMTTiW7spdVOSgyw4w/RP0L30N
+-----END RSA PRIVATE KEY-----)";
+
 #endif
 
 // A continuación, variables que sólo aplican en el ESP32 derecho
@@ -139,6 +182,19 @@ twai_message_t mensajesCanLeidosSHA384[MENSAJES_SHA384];
 uint8_t sha384Recibido[LONGITUD_SHA384];
 twai_message_t mensajesCanLeidosSHA512[MENSAJES_SHA512];
 uint8_t sha512Recibido[LONGITUD_SHA512];
+twai_message_t mensajesCanLeidosRSA2048[MENSAJES_RSA2048];
+uint8_t salidaDescifradoRSA2048[LONGITUD_RSA2048];
+// Clave pública RSA-2048
+static const char CLAVE_PUBLICA_RSA2048[] PROGMEM =
+    R"(-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvkyB7cLjZ3Gjzc/rVSCg
+SkQZFGv1KGl/KsbaMLYNzXUbFa+fBhGZG+x9+uhrjPN+YAFm4/9NTDsQrnL1KEax
+YyS58S4LzghjTU6iQ3bNU6rSucogxbDjH+K9YvHyApvkaIRqGNxzHQzlukREKb2/
+lV5UjnTtg4pSdWWLw7vjEChSXKWd87oYJyJJOFr+67vh0NgrRDhOERgDKE1e3eGh
++G4Fq7enLowiFmkQI5T2GF8CRVMeQb5hJe3Cd+e3Rp6LUwFq+8WjMKPZrYSkQxd4
+PrvGCl+92bZMVmS1IYnz7CFpvnZ2Z5rbsY5IYJHUuRmKtU+Zsgf6gQCoGHm9/60m
+SwIDAQAB
+-----END PUBLIC KEY-----)";
 #endif
 
 void setup()
@@ -708,6 +764,67 @@ void loop()
   media = (double)sumatorio / NUM_REP;
   Serial.printf("\nLa media del envío de datos hasheados con SHA-512 ha sido: %f us\n", media);
 
+  // Empezamos con el cifrado RSA-2048
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    // Inicio el contador
+    tiempoInicial = micros();
+    // Rellenamos el dato a ser cifrado con RSA-2048
+    memset(entradaCifradoRSA2048, 0, sizeof(LONGITUD_RSA2048)); // Padding ya que la entrada del cifrador es de 256 bytes
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      entradaCifradoRSA2048[i] = i;
+    }
+    // Realizamos el cifrado con RSA-2048
+    mbedtls_pk_init(&contextoClaveRSA2048);                                                                                                // Inicializamos el contexto RSA-2048
+    mbedtls_pk_parse_key(&contextoClaveRSA2048, (const unsigned char *)CLAVE_PRIVADA_RSA2048, strlen(CLAVE_PRIVADA_RSA2048) + 1, NULL, 0); // Parsear claves
+    contextoRSA2048 = mbedtls_pk_rsa(contextoClaveRSA2048);
+    mbedtls_rsa_private(contextoRSA2048, NULL, NULL, entradaCifradoRSA2048, mensajeCifradoRSA2048);
+    mbedtls_pk_free(&contextoClaveRSA2048); // Limpiamos el contexto de la clave RSA-2048
+    mbedtls_rsa_free(contextoRSA2048);      // Limpiamos el contexto RSA-2048
+    // Rellenamos los mensajes a enviar
+    for (uint8_t i = 0; i < MENSAJES_RSA2048; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        mensajeCANTransmitido.data[j] = mensajeCifradoRSA2048[j + i * LONGITUD_MENSAJE_CAN];
+      }
+      // Enviar el mensaje CAN
+      twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    }
+    // Esperamos a que nos llegue el mensaje de vuelta
+    while (twai_receive(&mensajeCANLeido, pdMS_TO_TICKS(0)) != ESP_OK)
+    {
+    }
+    // Momento que finalizamos la cuenta
+    tiempoFinal = micros();
+    // Tiempo empleado en el proceso
+    if (k > 0)
+    {
+      tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
+    }
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien el hash
+    uint8_t original[TWAI_FRAME_MAX_DLC] = {0, 1, 2, 3, 4, 5, 6, 7};
+    if (memcmp(mensajeCANLeido.data, original, LONGITUD_MENSAJE_CAN) == 0)
+    {
+      Serial.printf("En la iteración %d el cifrado RSA-2048 ha ido BIEN\n", k);
+    }
+    else
+    {
+      Serial.printf("En la iteración %d el cifrado RSA-2048 ha ido MAL\n", k);
+    }
+    */
+  }
+  // Mostramos cuánto se ha tardado en cada iteración y la media
+  sumatorio = 0;
+  for (uint8_t i = 0; i < NUM_REP; i++)
+  {
+    Serial.printf("%d ", tiempoTranscurrido[i]);
+    sumatorio += tiempoTranscurrido[i];
+  }
+  media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
+  Serial.printf("\nLa media del envío de datos hasheados con RSA-2048 ha sido: %f ms\n", media);
+
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 izquierdo");
   esp_deep_sleep_start();
@@ -1242,6 +1359,41 @@ void loop()
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
   }
   Serial.println("Recibidos todos los mensajes firmados con SHA-512");
+
+  // Iniciamos la fase de recibir mensajes cifrados con RSA-2048
+  for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
+  {
+    for (uint8_t i = 0; i < MENSAJES_RSA2048; i++)
+    {
+      // Esperamos a que nos llegue los mensajes cifrados
+      while (twai_receive(&mensajesCanLeidosRSA2048[i], pdMS_TO_TICKS(0)) != ESP_OK)
+      {
+      }
+    }
+    // Leemos el campo de datos recibido
+    for (uint8_t i = 0; i < MENSAJES_RSA2048; i++)
+    {
+      for (uint8_t j = 0; j < LONGITUD_MENSAJE_CAN; j++)
+      {
+        mensajeCifradoRSA2048[j + i * LONGITUD_MENSAJE_CAN] = mensajesCanLeidosRSA2048[i].data[j];
+      }
+    }
+    // Desciframos los mensajes recibidos
+    mbedtls_pk_init(&contextoClaveRSA2048); // Parsear claves
+    mbedtls_pk_parse_public_key(&contextoClaveRSA2048, (const unsigned char *)CLAVE_PUBLICA_RSA2048, strlen(CLAVE_PUBLICA_RSA2048) + 1);
+    contextoRSA2048 = mbedtls_pk_rsa(contextoClaveRSA2048);
+    mbedtls_rsa_public(contextoRSA2048, mensajeCifradoRSA2048, salidaDescifradoRSA2048);
+    mbedtls_pk_free(&contextoClaveRSA2048); // Limpiamos el contexto de la clave RSA-2048
+    mbedtls_rsa_free(contextoRSA2048);      // Limpiamos el contexto RSA-2048
+    // Rellenamos el campo de datos a enviar
+    for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
+    {
+      mensajeCANTransmitido.data[i] = salidaDescifradoRSA2048[i];
+    }
+    // Enviar el mensaje CAN
+    twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+  }
+  Serial.println("Recibidos todos los mensajes cifrados con RSA-2048");
 
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 derecho");

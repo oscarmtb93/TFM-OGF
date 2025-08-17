@@ -1,0 +1,82 @@
+#include <Arduino.h>
+#include "mbedtls/pk.h"
+#include "mbedtls/rsa.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/pem.h"
+
+// Selecciona tamaño: 2048, 3072 o 4096 bits
+const int tamanoClave = 2048;
+
+// Buffers para exportar claves PEM
+unsigned char clavePrivada[tamanoClave];
+unsigned char clavePublica[tamanoClave];
+
+void setup()
+{
+  Serial.begin(115200);
+
+  mbedtls_pk_context clave;
+  mbedtls_entropy_context entropia;
+  mbedtls_ctr_drbg_context contexto;
+
+  mbedtls_pk_init(&clave);
+  mbedtls_entropy_init(&entropia);
+  mbedtls_ctr_drbg_init(&contexto);
+
+  const char *pers = "claveRSA";
+  int ret = mbedtls_ctr_drbg_seed(&contexto, mbedtls_entropy_func, &entropia,
+                                  (const unsigned char *)pers, strlen(pers));
+  if (ret != 0)
+  {
+    Serial.printf("Fallo en DRBG seed: -0x%04X\n", -ret);
+    return;
+  }
+
+  int exponent = 65537;
+
+  ret = mbedtls_pk_setup(&clave, mbedtls_pk_info_from_type(MBEDTLS_PK_RSA));
+  if (ret != 0)
+  {
+    Serial.printf("Error setup: -0x%04X\n", -ret);
+    return;
+  }
+
+  ret = mbedtls_rsa_gen_key(mbedtls_pk_rsa(clave), mbedtls_ctr_drbg_random,
+                            &contexto, tamanoClave, exponent);
+  if (ret != 0)
+  {
+    Serial.printf("Error generar clave: -0x%04X\n", -ret);
+    return;
+  }
+
+  // Exportar privada
+  ret = mbedtls_pk_write_key_pem(&clave, clavePrivada, tamanoClave);
+  if (ret != 0)
+  {
+    Serial.printf("Error write priv: -0x%04X\n", -ret);
+    return;
+  }
+
+  // Exportar pública
+  ret = mbedtls_pk_write_pubkey_pem(&clave, clavePublica, tamanoClave);
+  if (ret != 0)
+  {
+    Serial.printf("Error write pub: -0x%04X\n", -ret);
+    return;
+  }
+
+  Serial.println("===== CLAVE PRIVADA (PEM) =====");
+  Serial.println((char *)clavePrivada);
+  Serial.println("===== CLAVE PÚBLICA (PEM) =====");
+  Serial.println((char *)clavePublica);
+
+  mbedtls_pk_free(&clave);
+  mbedtls_ctr_drbg_free(&contexto);
+  mbedtls_entropy_free(&entropia);
+}
+
+void loop()
+{
+  esp_deep_sleep_start();
+}
