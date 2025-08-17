@@ -306,7 +306,6 @@ void loop()
     mbedtls_aes_init(&cifradorAES); // Inicializamos el cifrador AES
     mbedtls_aes_setkey_enc(&cifradorAES, claveAES128, LONGITUD_128);
     mbedtls_aes_crypt_ecb(&cifradorAES, MBEDTLS_AES_ENCRYPT, entradaCifradoAES, mensajeCifradoAES);
-    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_AES; i++)
     {
@@ -323,6 +322,7 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -357,7 +357,6 @@ void loop()
     mbedtls_aes_init(&cifradorAES); // Inicializamos el cifrador AES
     mbedtls_aes_setkey_enc(&cifradorAES, claveAES256, LONGITUD_256);
     mbedtls_aes_crypt_ecb(&cifradorAES, MBEDTLS_AES_ENCRYPT, entradaCifradoAES, mensajeCifradoAES);
-    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_AES; i++)
     {
@@ -374,6 +373,7 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -407,7 +407,6 @@ void loop()
     mbedtls_md5_starts_ret(&contextoMD5);
     mbedtls_md5_update_ret(&contextoMD5, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_md5_finish_ret(&contextoMD5, md5Generado);
-    mbedtls_md5_free(&contextoMD5); // Limpiamos el contexto MD5
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_MD5; i++)
     {
@@ -424,6 +423,7 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_md5_free(&contextoMD5); // Limpiamos el contexto MD5
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -467,7 +467,6 @@ void loop()
     mbedtls_sha1_starts_ret(&contextoSHA1);
     mbedtls_sha1_update_ret(&contextoSHA1, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha1_finish_ret(&contextoSHA1, sha1Generado);
-    mbedtls_sha1_free(&contextoSHA1); // Limpiamos el contexto SHA-1
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_SHA1 - 1; i++)
     {
@@ -491,6 +490,7 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_sha1_free(&contextoSHA1); // Limpiamos el contexto SHA-1
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -534,7 +534,6 @@ void loop()
     mbedtls_sha256_starts_ret(&contextoSHA224, 1);
     mbedtls_sha256_update_ret(&contextoSHA224, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha256_finish_ret(&contextoSHA224, sha224Generado);
-    mbedtls_sha256_free(&contextoSHA224); // Limpiamos el contexto SHA-224
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_SHA224 - 1; i++)
     {
@@ -558,6 +557,7 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_sha256_free(&contextoSHA224); // Limpiamos el contexto SHA-224
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -601,7 +601,6 @@ void loop()
     mbedtls_sha256_starts_ret(&contextoSHA256, 0);
     mbedtls_sha256_update_ret(&contextoSHA256, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha256_finish_ret(&contextoSHA256, sha256Generado);
-    mbedtls_sha256_free(&contextoSHA256); // Limpiamos el contexto SHA-256
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_SHA256; i++)
     {
@@ -618,6 +617,7 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_sha256_free(&contextoSHA256); // Limpiamos el contexto SHA-256
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -661,7 +661,6 @@ void loop()
     mbedtls_sha512_starts_ret(&contextoSHA384, 1);
     mbedtls_sha512_update_ret(&contextoSHA384, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha512_finish_ret(&contextoSHA384, sha384Generado);
-    mbedtls_sha512_free(&contextoSHA384); // Limpiamos el contexto SHA-384
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_SHA384; i++)
     {
@@ -678,6 +677,7 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_sha512_free(&contextoSHA384); // Limpiamos el contexto SHA-384
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -721,7 +721,6 @@ void loop()
     mbedtls_sha512_starts_ret(&contextoSHA512, 0);
     mbedtls_sha512_update_ret(&contextoSHA512, mensajeCANTransmitido.data, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha512_finish_ret(&contextoSHA512, sha512Generado);
-    mbedtls_sha512_free(&contextoSHA512); // Limpiamos el contexto SHA-512
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_SHA512; i++)
     {
@@ -738,6 +737,7 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_sha512_free(&contextoSHA512); // Limpiamos el contexto SHA-512
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -780,8 +780,6 @@ void loop()
     mbedtls_pk_parse_key(&contextoClaveRSA2048, (const unsigned char *)CLAVE_PRIVADA_RSA2048, strlen(CLAVE_PRIVADA_RSA2048) + 1, NULL, 0); // Parsear claves
     contextoRSA2048 = mbedtls_pk_rsa(contextoClaveRSA2048);
     mbedtls_rsa_private(contextoRSA2048, NULL, NULL, entradaCifradoRSA2048, mensajeCifradoRSA2048);
-    mbedtls_pk_free(&contextoClaveRSA2048); // Limpiamos el contexto de la clave RSA-2048
-    mbedtls_rsa_free(contextoRSA2048);      // Limpiamos el contexto RSA-2048
     // Rellenamos los mensajes a enviar
     for (uint8_t i = 0; i < MENSAJES_RSA2048; i++)
     {
@@ -798,6 +796,8 @@ void loop()
     }
     // Momento que finalizamos la cuenta
     tiempoFinal = micros();
+    mbedtls_pk_free(&contextoClaveRSA2048); // Limpiamos el contexto de la clave RSA-2048
+    mbedtls_rsa_free(contextoRSA2048);      // Limpiamos el contexto RSA-2048
     // Tiempo empleado en el proceso
     if (k > 0)
     {
@@ -874,7 +874,6 @@ void loop()
     mbedtls_aes_init(&cifradorAES); // Inicializamos el cifrador AES
     mbedtls_aes_setkey_dec(&cifradorAES, claveAES128, LONGITUD_128);
     mbedtls_aes_crypt_ecb(&cifradorAES, MBEDTLS_AES_DECRYPT, mensajeCifradoAES, salidaDescifradoAES);
-    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Rellenamos el campo de datos a enviar
     for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
     {
@@ -882,6 +881,7 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
   }
   Serial.println("Recibidos todos los mensajes cifrados con AES-128");
 
@@ -907,7 +907,6 @@ void loop()
     mbedtls_aes_init(&cifradorAES); // Inicializamos el cifrador AES
     mbedtls_aes_setkey_dec(&cifradorAES, claveAES256, LONGITUD_256);
     mbedtls_aes_crypt_ecb(&cifradorAES, MBEDTLS_AES_DECRYPT, mensajeCifradoAES, salidaDescifradoAES);
-    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
     // Rellenamos el campo de datos a enviar
     for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
     {
@@ -915,6 +914,7 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_aes_free(&cifradorAES); // Limpiamos el cifrador AES
   }
   Serial.println("Recibidos todos los mensajes cifrados con AES-256");
 
@@ -950,7 +950,6 @@ void loop()
     mbedtls_md5_starts_ret(&contextoMD5);
     mbedtls_md5_update_ret(&contextoMD5, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_md5_finish_ret(&contextoMD5, md5Generado);
-    mbedtls_md5_free(&contextoMD5); // Limpiamos el contexto MD5
     /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
     if (k == 50)
     {
@@ -987,6 +986,7 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_md5_free(&contextoMD5); // Limpiamos el contexto MD5
   }
   Serial.println("Recibidos todos los mensajes firmados con MD5");
 
@@ -1027,7 +1027,6 @@ void loop()
     mbedtls_sha1_starts_ret(&contextoSHA1);
     mbedtls_sha1_update_ret(&contextoSHA1, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha1_finish_ret(&contextoSHA1, sha1Generado);
-    mbedtls_sha1_free(&contextoSHA1); // Limpiamos el contexto SHA-1
     /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
     if (k == 50)
     {
@@ -1064,6 +1063,7 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_sha1_free(&contextoSHA1); // Limpiamos el contexto SHA-1
   }
   Serial.println("Recibidos todos los mensajes firmados con SHA-1");
 
@@ -1104,7 +1104,6 @@ void loop()
     mbedtls_sha256_starts_ret(&contextoSHA224, 1);
     mbedtls_sha256_update_ret(&contextoSHA224, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha256_finish_ret(&contextoSHA224, sha224Generado);
-    mbedtls_sha256_free(&contextoSHA224); // Limpiamos el contexto SHA-224
     /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
     if (k == 50)
     {
@@ -1141,6 +1140,7 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_sha256_free(&contextoSHA224); // Limpiamos el contexto SHA-224
   }
   Serial.println("Recibidos todos los mensajes firmados con SHA-224");
 
@@ -1176,7 +1176,6 @@ void loop()
     mbedtls_sha256_starts_ret(&contextoSHA256, 0);
     mbedtls_sha256_update_ret(&contextoSHA256, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha256_finish_ret(&contextoSHA256, sha256Generado);
-    mbedtls_sha256_free(&contextoSHA256); // Limpiamos el contexto SHA-256
     /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
     if (k == 50)
     {
@@ -1213,6 +1212,7 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_sha256_free(&contextoSHA256); // Limpiamos el contexto SHA-256
   }
   Serial.println("Recibidos todos los mensajes firmados con SHA-256");
 
@@ -1248,7 +1248,6 @@ void loop()
     mbedtls_sha512_starts_ret(&contextoSHA384, 1);
     mbedtls_sha512_update_ret(&contextoSHA384, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha512_finish_ret(&contextoSHA384, sha384Generado);
-    mbedtls_sha512_free(&contextoSHA384); // Limpiamos el contexto SHA-384
     /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
     if (k == 50)
     {
@@ -1285,6 +1284,7 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_sha512_free(&contextoSHA384); // Limpiamos el contexto SHA-384
   }
   Serial.println("Recibidos todos los mensajes firmados con SHA-384");
 
@@ -1320,7 +1320,6 @@ void loop()
     mbedtls_sha512_starts_ret(&contextoSHA512, 0);
     mbedtls_sha512_update_ret(&contextoSHA512, datosRecibidos, LONGITUD_MENSAJE_CAN); // El último parámetro es la longitud de la entrada, se podría hacer con strlen((char*)mensajeCANTransmitido.data)
     mbedtls_sha512_finish_ret(&contextoSHA512, sha512Generado);
-    mbedtls_sha512_free(&contextoSHA512); // Limpiamos el contexto SHA-512
     /* Estas líneas comentadas fueron de debug para comprobar el hash recibido y generado
     if (k == 50)
     {
@@ -1357,6 +1356,7 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_sha512_free(&contextoSHA512); // Limpiamos el contexto SHA-512
   }
   Serial.println("Recibidos todos los mensajes firmados con SHA-512");
 
@@ -1383,8 +1383,6 @@ void loop()
     mbedtls_pk_parse_public_key(&contextoClaveRSA2048, (const unsigned char *)CLAVE_PUBLICA_RSA2048, strlen(CLAVE_PUBLICA_RSA2048) + 1);
     contextoRSA2048 = mbedtls_pk_rsa(contextoClaveRSA2048);
     mbedtls_rsa_public(contextoRSA2048, mensajeCifradoRSA2048, salidaDescifradoRSA2048);
-    mbedtls_pk_free(&contextoClaveRSA2048); // Limpiamos el contexto de la clave RSA-2048
-    mbedtls_rsa_free(contextoRSA2048);      // Limpiamos el contexto RSA-2048
     // Rellenamos el campo de datos a enviar
     for (uint8_t i = 0; i < LONGITUD_MENSAJE_CAN; i++)
     {
@@ -1392,6 +1390,8 @@ void loop()
     }
     // Enviar el mensaje CAN
     twai_transmit(&mensajeCANTransmitido, pdMS_TO_TICKS(1000));
+    mbedtls_pk_free(&contextoClaveRSA2048); // Limpiamos el contexto de la clave RSA-2048
+    mbedtls_rsa_free(contextoRSA2048);      // Limpiamos el contexto RSA-2048
   }
   Serial.println("Recibidos todos los mensajes cifrados con RSA-2048");
 
