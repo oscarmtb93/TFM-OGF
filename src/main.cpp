@@ -954,7 +954,7 @@ void loop()
     {
       tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
     }
-    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien el hash
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor realizó bien el cifrado
     uint8_t original[TWAI_FRAME_MAX_DLC] = {0, 1, 2, 3, 4, 5, 6, 7};
     if (memcmp(mensajeCANLeido.data, original, LONGITUD_MENSAJE_CAN) == 0)
     {
@@ -974,7 +974,7 @@ void loop()
     sumatorio += tiempoTranscurrido[i];
   }
   media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
-  Serial.printf("\nLa media del envío de datos hasheados con RSA-2048 ha sido: %f ms\n", media);
+  Serial.printf("\nLa media del envío de datos cifrados con RSA-2048 ha sido: %f ms\n", media);
 
   // Empezamos con el cifrado RSA-3072
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -1015,7 +1015,7 @@ void loop()
     {
       tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
     }
-    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien el hash
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor realizó bien el cifrado
     uint8_t original[TWAI_FRAME_MAX_DLC] = {0, 1, 2, 3, 4, 5, 6, 7};
     if (memcmp(mensajeCANLeido.data, original, LONGITUD_MENSAJE_CAN) == 0)
     {
@@ -1035,7 +1035,7 @@ void loop()
     sumatorio += tiempoTranscurrido[i];
   }
   media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
-  Serial.printf("\nLa media del envío de datos hasheados con RSA-3072 ha sido: %f ms\n", media);
+  Serial.printf("\nLa media del envío de datos cifrados con RSA-3072 ha sido: %f ms\n", media);
 
   // Empezamos con el cifrado RSA-4096
   for (uint8_t k = 0; k <= NUM_REP; k++) // Hacemos NUM_REP+1 porque la primera iteración es unos 30 us más lenta
@@ -1076,7 +1076,7 @@ void loop()
     {
       tiempoTranscurrido[k - 1] = tiempoFinal - tiempoInicial;
     }
-    /* Estas líneas comentadas fueron de debug para comprobar si el receptor generó bien el hash
+    /* Estas líneas comentadas fueron de debug para comprobar si el receptor realizó bien el cifrado
     uint8_t original[TWAI_FRAME_MAX_DLC] = {0, 1, 2, 3, 4, 5, 6, 7};
     if (memcmp(mensajeCANLeido.data, original, LONGITUD_MENSAJE_CAN) == 0)
     {
@@ -1096,7 +1096,7 @@ void loop()
     sumatorio += tiempoTranscurrido[i];
   }
   media = (double)sumatorio / (NUM_REP * 1000); // Guardo la media en ms
-  Serial.printf("\nLa media del envío de datos hasheados con RSA-4096 ha sido: %f ms\n", media);
+  Serial.printf("\nLa media del envío de datos cifrados con RSA-4096 ha sido: %f ms\n", media);
 
   // Hemos acabado, mandamos al ESP32 a dormir para que no se ejecute infinitamente
   Serial.println("Fin de la ejecución del ESP32 izquierdo");
